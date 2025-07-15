@@ -2,8 +2,11 @@ import { mkdirSync } from 'fs';
 import multer from 'multer';
 import { uploadDir } from './enviroment';
 import { v4 as uuid } from 'uuid';
+import path from 'path';
 
-mkdirSync(uploadDir, { recursive: true });
+const uploadDirectory = path.resolve(process.cwd(), uploadDir);
+
+mkdirSync(uploadDirectory, { recursive: true });
 
 export const upload = multer({
   storage: multer.diskStorage({

@@ -1,16 +1,21 @@
-import express from "express";
-import morgan from "morgan";
-import { VERSION } from "./config/enviroment";
-import { formatUptime } from "./utils/formatUptime";
+import express from 'express';
+import morgan from 'morgan';
+import { VERSION } from './config/enviroment';
+import { formatUptime } from './utils/formatUptime';
+import convertRoutes from './routes/convert.routes';
+import statusRoutes from './routes/status.routes';
 
 const app = express();
 
 app.use(express.json());
-app.use(morgan("dev"));
+app.use(morgan('dev'));
 
-app.get("/health", (req, res) => {
+app.use('/api', convertRoutes);
+app.use('/api', statusRoutes);
+
+app.get('/health', (req, res) => {
   res.status(200).json({
-    status: "OK",
+    status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: formatUptime(process.uptime()),
     version: VERSION,
