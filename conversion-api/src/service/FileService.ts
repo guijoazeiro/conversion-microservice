@@ -5,7 +5,7 @@ import { existsSync } from 'fs';
 
 const outputDirectory = path.resolve(process.cwd(), OUTPUT_DIR);
 
-export class StatusService {
+export class FileService {
   constructor(private taskRepository = new TaskRepository()) {
     this.taskRepository = taskRepository;
   }

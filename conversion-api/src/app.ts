@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 app.use('/api', convertRoutes);
-app.use('/api', statusRoutes);
+app.use('/api/file', statusRoutes);
 
 app.get('/health', (req, res) => {
   res.status(200).json({

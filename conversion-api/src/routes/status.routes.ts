@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { StatusController } from '../controller/StatusController';
+import { FileController } from '../controller/FileController';
 
 const router = Router();
-const statusController = new StatusController();
+const fileController = new FileController();
 
-router.get('/status/:id', (req, res) => statusController.getStatus(req, res));
-router.get('/download/:id', (req, res) => statusController.download(req, res));
+router.get('/status/:id', (req, res) => fileController.getStatus(req, res));
+router.get('/download/:id', (req, res) => fileController.download(req, res));
 
 export default router;

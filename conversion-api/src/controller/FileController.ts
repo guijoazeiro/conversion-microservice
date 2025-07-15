@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import { StatusService } from '../service/StatusService';
+import { FileService } from '../service/FileService';
 
-export class StatusController {
-  constructor(private statusService = new StatusService()) {
-    this.statusService = statusService;
+export class FileController {
+  constructor(private fileService = new FileService()) {
+    this.fileService = fileService;
   }
 
   async getStatus(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const status = await this.statusService.getStatus(id);
+      const status = await this.fileService.getStatus(id);
       res.json(status);
     } catch (error) {
       res.status(500).json({ error: 'Erro ao verificar status' });
@@ -18,7 +18,7 @@ export class StatusController {
   async download(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const file = await this.statusService.download(id);
+      const file = await this.fileService.download(id);
       res.download(file);
     } catch (error) {
       if (
