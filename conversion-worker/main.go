@@ -20,6 +20,7 @@ type JobData struct {
 	ID       string `json:"id"`
 	Path     string `json:"path"`
 	Mimetype string `json:"mimetype"`
+	Format   string `json:"format"`
 }
 
 var (
@@ -30,10 +31,7 @@ var (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	_ = godotenv.Load()
 
 	redisClient = redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")),
@@ -51,9 +49,10 @@ func main() {
 			continue
 		}
 		if err != nil {
-			log.Println("Erro ao obter job da fila:", err)
+			log.Println("Erro lendo fila:", err)
 			continue
 		}
+
 		jobKey := "bull:convert:" + jobID
 		dataJSON, err := redisClient.HGet(ctx, jobKey, "data").Result()
 		if err != nil {
@@ -67,41 +66,56 @@ func main() {
 			continue
 		}
 
-		if err := json.Unmarshal([]byte(dataJSON), &job); err != nil {
-			log.Println("Erro no unmarshal:", err)
-			continue
-		}
-
 		log.Printf("[%s] Job recebido", job.ID)
-		updateStatus(job.ID, "processing")
+		updateStatus(job.ID, "processing", "")
 
-		if job.Mimetype != "video/mp4" {
+		if job.Mimetype != "video/mp4" && job.Mimetype != "audio/wav" {
 			log.Println("Mimetype inválido:", job.Mimetype)
-			updateStatus(job.ID, "failed")
+			updateStatus(job.ID, "failed", "")
 			continue
 		}
 
-		output := fmt.Sprintf("../tmp/output/%s.mp3", job.ID)
-		err = convertToMp3(job.Path, output)
+		outputPath := fmt.Sprintf("../tmp/output/%s.%s", job.ID, job.Format)
+		err = convertToFormat(job.Path, job.Format, outputPath)
 		if err != nil {
 			log.Printf("[%s] Erro na conversão: %s\n", job.ID, err)
-			updateStatus(job.ID, "failed")
+			updateStatus(job.ID, "failed", "")
 			continue
 		}
 
 		log.Printf("[%s] Conversão concluída", job.ID)
-		updateStatus(job.ID, "done")
+		updateStatus(job.ID, "done", outputPath)
 	}
 }
 
-func convertToMp3(input, output string) error {
-	log.Printf("Convertendo %s para %s\n", input, output)
-	cmd := exec.Command("ffmpeg", "-y", "-i", input, "-vn", "-acodec", "libmp3lame", output)
+func convertToFormat(input, format, output string) error {
+	args := []string{"-y", "-i", input}
+
+	switch format {
+	case "mp3":
+		args = append(args, "-vn", "-acodec", "libmp3lame", output)
+	case "avi":
+		args = append(args, "-c:v", "libx264", "-f", "avi", output)
+	case "wav":
+		args = append(args, output)
+	case "mp4":
+		args = append(args, "-c:v", "libx264", "-f", "mp4", output)
+	case "mkv":
+		args = append(args, "-c:v", "libx264", "-f", "matroska", output)
+	default:
+		return fmt.Errorf("formato não suportado: %s", format)
+	}
+
+	cmd := exec.Command("ffmpeg", args...)
 	return cmd.Run()
 }
 
-func updateStatus(id, status string) {
-	_, err := tasksCol.UpdateOne(ctx, bson.M{"id": id}, bson.M{"$set": bson.M{"status": status}})
+func updateStatus(id, status, output string) {
+	update := bson.M{"status": status}
+	if output != "" {
+		update["output"] = output
+	}
+	_, err := tasksCol.UpdateOne(ctx, bson.M{"id": id}, bson.M{"$set": update})
 	if err != nil {
 		log.Printf("Erro ao atualizar status de %s: %s\n", id, err)
 	}

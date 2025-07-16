@@ -8,9 +8,11 @@ export class ConvertController {
 
   async handle(req: Request, res: Response) {
     const file = req.file;
+    const { format } = req.body;
+
     if (!file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const task = await this.convertService.process(file);
+    const task = await this.convertService.process({ file, format });
 
     res.status(201).json(task);
   }

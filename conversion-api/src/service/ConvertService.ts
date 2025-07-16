@@ -14,7 +14,25 @@ export class ConvertService {
     this.taskRepository = taskRepository;
   }
 
-  async process(file: Express.Multer.File) {
+  async process({
+    file,
+    format,
+  }: {
+    file: Express.Multer.File;
+    format: string;
+  }) {
+    const allowedFormats = ['mp3', 'wav', 'avi', 'mp4', 'mkv'];
+
+    if (!allowedFormats.includes(format)) {
+      throw new Error('Formato de arquivo inválido');
+    }
+
+    const originalFileFormat = file.originalname.split('.').pop();
+
+    if(originalFileFormat === format) {
+      throw new Error("Arquivo com o mesmo formato");
+    }
+
     const id = file.filename.split('.')[0];
 
     await this.taskRepository.create({
@@ -30,6 +48,7 @@ export class ConvertService {
       id,
       path: file.path,
       mimetype: file.mimetype,
+      format,
     });
 
     return { id };
