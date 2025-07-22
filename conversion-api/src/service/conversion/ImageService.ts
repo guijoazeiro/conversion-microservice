@@ -31,6 +31,7 @@ export class ImageService {
       storedName: file.filename,
       mimetype: file.mimetype,
       path: file.path,
+      format,
       status: 'pending',
     };
     await this.taskRepository.create(fileObject);
