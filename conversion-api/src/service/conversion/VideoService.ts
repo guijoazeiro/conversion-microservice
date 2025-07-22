@@ -1,3 +1,4 @@
+import { HttpError } from '../../errors/HttpError';
 import { convertQueue } from '../../jobs/convert.queue';
 import { TaskRepository } from '../../repositories/TaskRepository';
 
@@ -14,14 +15,18 @@ export class VideoService {
     format: string;
   }) {
     const allowedFormats = ['mp3', 'wav', 'avi', 'mp4', 'mkv'];
+
     if (!allowedFormats.includes(format)) {
-      throw new Error('Formato de arquivo inválido');
+      throw new HttpError(
+        'Formato de arquivo para ser convertido inválido',
+        400,
+      );
     }
 
     const originalFileFormat = file.originalname.split('.').pop();
 
     if (originalFileFormat === format) {
-      throw new Error('Arquivo com o mesmo formato');
+      throw new HttpError('Arquivo com o mesmo formato de saída', 400);
     }
 
     const id = file.filename.split('.')[0];

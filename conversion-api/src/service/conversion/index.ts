@@ -1,3 +1,4 @@
+import { HttpError } from '../../errors/HttpError';
 import { AudioService } from './AudioService';
 import { ImageService } from './ImageService';
 import { VideoService } from './VideoService';
@@ -24,6 +25,7 @@ export class ConversionService {
     if (type === 'image') return this.imageService.process({ file, format });
     if (type === 'video') return this.videoService.process({ file, format });
     if (type === 'audio') return this.audioService.process({ file, format });
-    throw new Error('Formato de arquivo inválido');
+
+    throw new HttpError(`Arquivo não pode ser convertido`, 400);
   }
 }
