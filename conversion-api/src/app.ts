@@ -7,7 +7,8 @@ import statusRoutes from './routes/status.routes';
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '1gb' }));
+app.use(express.urlencoded({ extended: true, limit: '1gb' }));
 app.use(morgan('dev'));
 
 app.use('/api', convertRoutes);
