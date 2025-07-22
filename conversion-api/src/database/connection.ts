@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import { MONGODB_URI } from '../config/enviroment';
+import logger from '../config/logger';
 
 export async function connectDB() {
-  console.log('Conectando ao MongoDB');
+  logger.info('Conectando ao MongoDB');
 
   try {
     await mongoose.connect(MONGODB_URI, {
@@ -10,8 +11,8 @@ export async function connectDB() {
       socketTimeoutMS: 45000,
       bufferCommands: false,
     });
-    console.log('Conectado ao MongoDB');
+    logger.info('Conectado ao MongoDB');
   } catch (error) {
-    console.error('Erro ao conectar ao MongoDB:', error);
+    logger.error('Erro ao conectar ao MongoDB:', error);
   }
 }

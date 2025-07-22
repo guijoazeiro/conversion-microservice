@@ -2,15 +2,16 @@ import http from 'http';
 import app from './app';
 import { PORT } from './config/enviroment';
 import { connectDB } from './database/connection';
+import logger from './config/logger';
 
 async function startServer() {
   try {
     await connectDB();
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+      logger.info(`Server running on http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
   }
 }
 
