@@ -13,9 +13,15 @@ export class ConversionService {
     this.audioService = audioService;
   }
 
-  async process({ file, format }: { file: Express.Multer.File; format: string }) {
+  async process({
+    file,
+    format,
+  }: {
+    file: Express.Multer.File;
+    format: string;
+  }) {
     const type = file.mimetype.split('/')[0];
-    if(type === 'image') return this.imageService.process({ file, format });    
+    if (type === 'image') return this.imageService.process({ file, format });
     if (type === 'video') return this.videoService.process({ file, format });
     if (type === 'audio') return this.audioService.process({ file, format });
     throw new Error('Formato de arquivo inválido');

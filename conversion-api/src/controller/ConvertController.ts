@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {ConversionService} from  '../service/conversion'
+import { ConversionService } from '../service/conversion';
 
 export class ConvertController {
   constructor(private convertService = new ConversionService()) {
