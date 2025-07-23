@@ -7,6 +7,10 @@ const TaskSchema = new Schema(
     storedName: String,
     mimetype: String,
     path: String,
+    format: String,
+    inputPath: String,
+    outputPath: String,
+    outputName: String,
     status: {
       type: String,
       enum: ['pending', 'processing', 'done', 'failed'],

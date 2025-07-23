@@ -20,10 +20,18 @@ export class FileService {
   }
 
   async download(id: string) {
-    const file = join(outputDirectory, `${id}.mp3`);
-    if (!existsSync(file)) {
+    const file = await this.taskRepository.findById(id);
+    if (!file) {
       throw new HttpError('Arquivo não encontrado', 404);
     }
-    return file;
+    if (file.status !== 'done') {
+      throw new HttpError('Arquivo ainda não convertido', 400);
+    }
+
+    if (!file.outputPath || !existsSync(file.outputPath)) {
+      throw new HttpError('Arquivo não encontrado', 404);
+    }
+
+    return file.outputPath;
   }
 }

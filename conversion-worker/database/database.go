@@ -20,10 +20,10 @@ func New(client *mongo.Client) *Database {
 	}
 }
 
-func (db *Database) UpdateStatus(id, status, output string) {
-	update := bson.M{"status": status}
+func (db *Database) UpdateStatus(id, status, output, filename string) {
+	update := bson.M{"status": status, "outputName": filename}
 	if output != "" {
-		update["output"] = output
+		update["outputPath"] = output
 	}
 	_, err := db.tasksCol.UpdateOne(db.ctx, bson.M{"id": id}, bson.M{"$set": update})
 	if err != nil {

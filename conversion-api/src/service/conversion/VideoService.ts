@@ -14,7 +14,16 @@ export class VideoService {
     file: Express.Multer.File;
     format: string;
   }) {
-    const allowedFormats = ['mp3', 'wav', 'avi', 'mp4', 'mkv', 'mov', 'wmv', 'flv'];
+    const allowedFormats = [
+      'mp3',
+      'wav',
+      'avi',
+      'mp4',
+      'mkv',
+      'mov',
+      'wmv',
+      'flv',
+    ];
 
     if (!allowedFormats.includes(format)) {
       throw new HttpError(

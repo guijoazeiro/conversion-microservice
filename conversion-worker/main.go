@@ -68,24 +68,26 @@ func main() {
 		log.Printf("[%s] Job recebido", job.ID)
 		log.Printf("JobData: %+v\n", job)
 
-		db.UpdateStatus(job.ID, "processing", "")
+		db.UpdateStatus(job.ID, "processing", "", "")
 
 		handler := converter.GetHandler(job.Mimetype)
 		if handler == nil {
 			log.Println("Mimetype inválido:", job.Mimetype)
-			db.UpdateStatus(job.ID, "failed", "")
+			db.UpdateStatus(job.ID, "failed", "", "")
 			continue
 		}
 
-		outputPath := fmt.Sprintf("../tmp/output/%s.%s", job.ID, job.Format)
+		fileName := job.ID + "." + job.Format
+
+		outputPath := fmt.Sprintf("../tmp/output/%s", fileName)
 		err = handler.Convert(job.Path, job.Format, outputPath)
 		if err != nil {
 			log.Printf("[%s] Erro na conversão: %s\n", job.ID, err)
-			db.UpdateStatus(job.ID, "failed", "")
+			db.UpdateStatus(job.ID, "failed", "", "")
 			continue
 		}
 
 		log.Printf("[%s] Conversão concluída! Output: %s", job.ID, outputPath)
-		db.UpdateStatus(job.ID, "done", outputPath)
+		db.UpdateStatus(job.ID, "done", outputPath, fileName)
 	}
 }
