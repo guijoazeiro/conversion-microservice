@@ -12,7 +12,8 @@ export class ConvertController {
       const file = req.file;
       const { format } = req.body;
 
-      if (!file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+      if (!file)
+        return res.status(400).json({ error: 'Nenhum arquivo enviado' });
 
       const task = await this.convertService.process({ file, format });
 
