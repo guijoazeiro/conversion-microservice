@@ -23,6 +23,7 @@ export class VideoService {
       'mov',
       'wmv',
       'flv',
+      'gif',
     ];
 
     if (!allowedFormats.includes(format)) {

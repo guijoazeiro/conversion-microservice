@@ -25,6 +25,8 @@ func (c *VideoConverter) Convert(input, format, output string) error {
 		return exec.Command("ffmpeg", "-y", "-i", input, "-c:v", "libx264", "-f", "flv", output).Run()
 	case "wmv":
 		return exec.Command("ffmpeg", "-y", "-i", input, "-c:v", "libx264", "-f", "wmv", output).Run()
+	case "gif":
+		return exec.Command("ffmpeg", "-y", "-i", input, "-vf", "scale=480:-1:flags=lanczos,fps=15", "-f", "gif", "-loop", "0", output).Run()
 	default:
 		return fmt.Errorf("formato de vídeo não suportado: %s", format)
 	}
