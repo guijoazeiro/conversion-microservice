@@ -26,8 +26,16 @@ func (c *VideoConverter) Convert(input, format, output string) error {
 	case "wmv":
 		return exec.Command("ffmpeg", "-y", "-i", input, "-c:v", "libx264", "-f", "wmv", output).Run()
 	case "gif":
-		return exec.Command("ffmpeg", "-y", "-i", input, "-vf", "scale=480:-1:flags=lanczos,fps=15", "-f", "gif", "-loop", "0", output).Run()
+		return ConvertVideoToGifHighQuality(input, output)
 	default:
 		return fmt.Errorf("formato de vídeo não suportado: %s", format)
 	}
+}
+
+func ConvertVideoToGifHighQuality(input, output string) error {
+	if err := exec.Command("ffmpeg", "-y", "-i", input, "-vf", "scale=480:-1:flags=lanczos,fps=15,palettegen=stats_mode=diff", "/tmp/palette.png").Run(); err != nil {
+		return err
+	}
+
+	return exec.Command("ffmpeg", "-y", "-i", input, "-i", "/tmp/palette.png", "-lavfi", "scale=480:-1:flags=lanczos,fps=15,paletteuse=dither=floyd_steinberg", "-loop", "0", output).Run()
 }
