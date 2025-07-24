@@ -36,6 +36,42 @@ Este projeto é uma implementação de um sistema de conversão de arquivos em m
 3.  Acesse o diretório do microsserviço de API (`conversion-api`) e execute o comando `npm install` para instalar as dependências.
 4.  Execute o comando `npm start` para iniciar o microsserviço de API.
 5.  Execute o comando `go run main.go` para iniciar o microsserviço de conversão.
+# Conversão de Arquivos
+
+## Conversão de Vídeos
+
+Os vídeos podem ser convertidos para os seguintes formatos:
+
+* `mp3`
+* `wav`
+* `avi`
+* `mp4`
+* `mkv`
+* `mov`
+* `wmv`
+* `flv`
+* `gif`
+* `images`
+
+## Conversão de Imagens
+
+As imagens podem ser convertidas para os seguintes formatos:
+
+* `jpg`
+* `jpeg`
+* `png`
+* `webp`
+
+## Conversão de Áudio
+
+Os arquivos de áudio podem ser convertidos para os seguintes formatos:
+
+* `mp3`
+* `wav`
+* `flac`
+* `ogg`
+* `wma`
+* `aac`
 
 ## Uso
 
