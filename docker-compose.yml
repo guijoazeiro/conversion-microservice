@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mongo:
     image: mongo:6
@@ -8,12 +6,60 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - conversion-network
 
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
+    networks:
+      - conversion-network
+
+  conversion-api:
+    build: ./conversion-api
+    container_name: conversion-api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - UPLOAD_DIR=/tmp/input
+      - MONGODB_URI=mongodb://mongo:27017/converter
+      - MONGO_URI=mongodb://mongo:27017/converter
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - conversion-files:/tmp
+      - ./conversion-api:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+      - redis
+    restart: unless-stopped
+    networks:
+      - conversion-network
+
+  conversion-worker:
+    build: ./conversion-worker
+    container_name: conversion-worker
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_URI=mongodb://mongo:27017/converter
+    volumes:
+      - conversion-files:/tmp
+    depends_on:
+      - mongo
+      - redis
+      - conversion-api
+    restart: unless-stopped
+    networks:
+      - conversion-network
 
 volumes:
   mongo_data:
+  conversion-files:
+
+networks:
+  conversion-network:
+    driver: bridge
