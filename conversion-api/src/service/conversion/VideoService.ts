@@ -24,6 +24,7 @@ export class VideoService {
       'wmv',
       'flv',
       'gif',
+      'images',
     ];
 
     if (!allowedFormats.includes(format)) {

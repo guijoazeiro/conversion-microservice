@@ -77,7 +77,13 @@ func main() {
 			continue
 		}
 
-		fileName := job.ID + "." + job.Format
+		var fileName string
+
+		if job.Format == "images" {
+			fileName = fmt.Sprintf("%s.zip", job.ID)
+		} else {
+			fileName = fmt.Sprintf("%s.%s", job.ID, job.Format)
+		}
 
 		outputPath := fmt.Sprintf("../tmp/output/%s", fileName)
 		err = handler.Convert(job.Path, job.Format, outputPath)
