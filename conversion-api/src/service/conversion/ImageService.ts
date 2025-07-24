@@ -1,6 +1,11 @@
 import { HttpError } from '../../errors/HttpError';
 import { convertQueue } from '../../jobs/convert.queue';
 import { TaskRepository } from '../../repositories/TaskRepository';
+import {
+  BAD_REQUEST_CODE,
+  IMAGE_ALLOWED_FORMATS,
+  STATUS_PENDING,
+} from '../../utils/constants';
 
 export class ImageService {
   constructor(private taskRepository = new TaskRepository()) {
@@ -13,19 +18,20 @@ export class ImageService {
     file: Express.Multer.File;
     format: string;
   }) {
-    const allowedFormats = ['jpg', 'jpeg', 'png', 'webp'];
-
-    if (!allowedFormats.includes(format)) {
+    if (!IMAGE_ALLOWED_FORMATS.includes(format)) {
       throw new HttpError(
         'Formato de arquivo para ser convertido inválido',
-        400,
+        BAD_REQUEST_CODE,
       );
     }
 
     const originalFileFormat = file.originalname.split('.').pop();
 
     if (originalFileFormat === format) {
-      throw new HttpError('Arquivo com o mesmo formato de saída', 400);
+      throw new HttpError(
+        'Arquivo com o mesmo formato de saída',
+        BAD_REQUEST_CODE,
+      );
     }
     const id = file.filename.split('.')[0];
 
@@ -36,7 +42,7 @@ export class ImageService {
       mimetype: file.mimetype,
       path: file.path,
       format,
-      status: 'pending',
+      status: STATUS_PENDING,
     };
     await this.taskRepository.create(fileObject);
 

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ConversionService } from '../service/conversion';
 import { HttpError } from '../errors/HttpError';
+import { BAD_REQUEST_CODE, CREATED_CODE } from '../utils/constants';
 
 export class ConvertController {
   constructor(private convertService = new ConversionService()) {
@@ -13,11 +14,13 @@ export class ConvertController {
       const { format } = req.body;
 
       if (!file)
-        return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+        return res
+          .status(BAD_REQUEST_CODE)
+          .json({ error: 'Nenhum arquivo enviado' });
 
       const task = await this.convertService.process({ file, format });
 
-      res.status(201).json(task);
+      res.status(CREATED_CODE).json(task);
     } catch (error) {
       if (error instanceof HttpError) {
         return res.status(error.statusCode).json({ error: error.message });

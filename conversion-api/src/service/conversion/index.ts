@@ -1,4 +1,5 @@
 import { HttpError } from '../../errors/HttpError';
+import { BAD_REQUEST_CODE } from '../../utils/constants';
 import { AudioService } from './AudioService';
 import { ImageService } from './ImageService';
 import { VideoService } from './VideoService';
@@ -26,6 +27,6 @@ export class ConversionService {
     if (type === 'video') return this.videoService.process({ file, format });
     if (type === 'audio') return this.audioService.process({ file, format });
 
-    throw new HttpError(`Arquivo não pode ser convertido`, 400);
+    throw new HttpError(`Arquivo não pode ser convertido`, BAD_REQUEST_CODE);
   }
 }

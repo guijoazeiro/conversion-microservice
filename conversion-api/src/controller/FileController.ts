@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { FileService } from '../service/FileService';
 import { HttpError } from '../errors/HttpError';
+import { INTERNAL_SERVER_ERROR_CODE } from '../utils/constants';
 
 export class FileController {
   constructor(private fileService = new FileService()) {
@@ -16,7 +17,9 @@ export class FileController {
       if (error instanceof HttpError) {
         return res.status(error.statusCode).json({ error: error.message });
       }
-      res.status(500).json({ error: 'Erro ao verificar status' });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .json({ error: 'Erro ao verificar status' });
     }
   }
   async download(req: Request, res: Response) {
@@ -28,7 +31,9 @@ export class FileController {
       if (error instanceof HttpError) {
         return res.status(error.statusCode).json({ error: error.message });
       }
-      res.status(500).json({ error: 'Erro ao baixar arquivo' });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .json({ error: 'Erro ao baixar arquivo' });
     }
   }
 }

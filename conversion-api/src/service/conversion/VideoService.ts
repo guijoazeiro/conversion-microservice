@@ -1,6 +1,11 @@
 import { HttpError } from '../../errors/HttpError';
 import { convertQueue } from '../../jobs/convert.queue';
 import { TaskRepository } from '../../repositories/TaskRepository';
+import {
+  BAD_REQUEST_CODE,
+  STATUS_PENDING,
+  VIDEO_ALLOWED_FORMATS,
+} from '../../utils/constants';
 
 export class VideoService {
   constructor(private taskRepository = new TaskRepository()) {
@@ -14,30 +19,20 @@ export class VideoService {
     file: Express.Multer.File;
     format: string;
   }) {
-    const allowedFormats = [
-      'mp3',
-      'wav',
-      'avi',
-      'mp4',
-      'mkv',
-      'mov',
-      'wmv',
-      'flv',
-      'gif',
-      'images',
-    ];
-
-    if (!allowedFormats.includes(format)) {
+    if (!VIDEO_ALLOWED_FORMATS.includes(format)) {
       throw new HttpError(
         'Formato de arquivo para ser convertido inválido',
-        400,
+        BAD_REQUEST_CODE,
       );
     }
 
     const originalFileFormat = file.originalname.split('.').pop();
 
     if (originalFileFormat === format) {
-      throw new HttpError('Arquivo com o mesmo formato de saída', 400);
+      throw new HttpError(
+        'Arquivo com o mesmo formato de saída',
+        BAD_REQUEST_CODE,
+      );
     }
 
     const id = file.filename.split('.')[0];
@@ -49,7 +44,7 @@ export class VideoService {
       mimetype: file.mimetype,
       path: file.path,
       format,
-      status: 'pending',
+      status: STATUS_PENDING,
     };
 
     await this.taskRepository.create(fileObject);

@@ -1,10 +1,7 @@
-import path, { join } from 'path';
 import { TaskRepository } from '../repositories/TaskRepository';
-import { OUTPUT_DIR } from '../config/enviroment';
 import { existsSync } from 'fs';
 import { HttpError } from '../errors/HttpError';
-
-const outputDirectory = path.resolve(process.cwd(), OUTPUT_DIR);
+import { BAD_REQUEST_CODE, NOT_FOUND_CODE } from '../utils/constants';
 
 export class FileService {
   constructor(private taskRepository = new TaskRepository()) {
@@ -14,7 +11,7 @@ export class FileService {
   async getStatus(id: string): Promise<{ status: string }> {
     const task = await this.taskRepository.findById(id);
     if (!task) {
-      throw new HttpError('Arquivo nao encontrado', 404);
+      throw new HttpError('Arquivo não encontrado', NOT_FOUND_CODE);
     }
     return { status: task.status };
   }
@@ -22,14 +19,14 @@ export class FileService {
   async download(id: string) {
     const file = await this.taskRepository.findById(id);
     if (!file) {
-      throw new HttpError('Arquivo não encontrado', 404);
+      throw new HttpError('Arquivo não encontrado', NOT_FOUND_CODE);
     }
     if (file.status !== 'done') {
-      throw new HttpError('Arquivo ainda não convertido', 400);
+      throw new HttpError('Arquivo ainda não convertido', BAD_REQUEST_CODE);
     }
 
     if (!file.outputPath || !existsSync(file.outputPath)) {
-      throw new HttpError('Arquivo não encontrado', 404);
+      throw new HttpError('Arquivo não encontrado', BAD_REQUEST_CODE);
     }
 
     return file.outputPath;

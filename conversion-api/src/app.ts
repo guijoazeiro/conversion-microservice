@@ -4,6 +4,7 @@ import { VERSION } from './config/enviroment';
 import { formatUptime } from './utils/formatUptime';
 import convertRoutes from './routes/convert.routes';
 import statusRoutes from './routes/status.routes';
+import { OK_CODE } from './utils/constants';
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use('/api', convertRoutes);
 app.use('/api/file', statusRoutes);
 
 app.get('/health', (req, res) => {
-  res.status(200).json({
+  res.status(OK_CODE).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: formatUptime(process.uptime()),
