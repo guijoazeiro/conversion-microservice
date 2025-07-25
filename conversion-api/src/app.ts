@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import { VERSION } from './config/enviroment';
 import { formatUptime } from './utils/formatUptime';
 import convertRoutes from './routes/convert.routes';
-import statusRoutes from './routes/status.routes';
+import filesRoutes from './routes/files.routes';
 import { OK_CODE } from './utils/constants';
 
 const app = express();
@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true, limit: '1gb' }));
 app.use(morgan('dev'));
 
 app.use('/api', convertRoutes);
-app.use('/api/file', statusRoutes);
+app.use('/api/file', filesRoutes);
 
 app.get('/health', (req, res) => {
   res.status(OK_CODE).json({

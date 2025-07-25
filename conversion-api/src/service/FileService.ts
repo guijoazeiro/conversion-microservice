@@ -31,4 +31,25 @@ export class FileService {
 
     return file.outputPath;
   }
+
+  async getFiles(params: {
+    status?: string;
+    format?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const { status, format, page = 1, limit = 20 } = params;
+    const skip = (page - 1) * limit;
+
+    const query: any = {};
+    if (status) query.status = status;
+    if (format) query.format = format;
+
+    return await this.taskRepository.getFiles({
+      query,
+      skip,
+      limit,
+      page: Number(page),
+    });
+  }
 }

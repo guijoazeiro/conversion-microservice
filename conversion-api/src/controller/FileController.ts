@@ -36,4 +36,22 @@ export class FileController {
         .json({ error: 'Erro ao baixar arquivo' });
     }
   }
+
+  async getFiles(req: Request, res: Response) {
+    try {
+      const { status, format, page, limit } = req.query;
+      const result = await this.fileService.getFiles({
+        status,
+        format,
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+      });
+      res.json(result);
+    } catch (error) {
+      console.error(error); // Log do erro para debug
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .json({ error: 'Erro ao buscar arquivos' });
+    }
+  }
 }
