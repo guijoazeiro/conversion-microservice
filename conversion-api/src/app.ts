@@ -5,12 +5,13 @@ import { formatUptime } from './utils/formatUptime';
 import convertRoutes from './routes/convert.routes';
 import filesRoutes from './routes/files.routes';
 import { OK_CODE } from './utils/constants';
+import httpLogger from './config/httplogger';
 
 const app = express();
 
 app.use(express.json({ limit: '1gb' }));
 app.use(express.urlencoded({ extended: true, limit: '1gb' }));
-app.use(morgan('dev'));
+app.use(httpLogger);
 
 app.use('/api', convertRoutes);
 app.use('/api/file', filesRoutes);
