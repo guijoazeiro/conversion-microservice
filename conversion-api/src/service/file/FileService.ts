@@ -1,7 +1,7 @@
-import { TaskRepository } from '../repositories/TaskRepository';
+import { TaskRepository } from '../../repositories/TaskRepository';
 import { existsSync } from 'fs';
-import { HttpError } from '../errors/HttpError';
-import { BAD_REQUEST_CODE, NOT_FOUND_CODE } from '../utils/constants';
+import { HttpError } from '../../errors/HttpError';
+import { BAD_REQUEST_CODE, NOT_FOUND_CODE } from '../../utils/constants';
 
 export class FileService {
   constructor(private taskRepository = new TaskRepository()) {

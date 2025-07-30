@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { FileService } from '../service/FileService';
+import { FileService } from '../service/file/FileService';
 import { HttpError } from '../errors/HttpError';
 import { INTERNAL_SERVER_ERROR_CODE } from '../utils/constants';
 
