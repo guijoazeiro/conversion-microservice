@@ -31,3 +31,11 @@ export const AUDIO_ALLOWED_FORMATS = [
   'wma',
   'aac',
 ];
+
+export type MediaType = 'audio' | 'image' | 'video';
+
+export const ALLOWED_FORMATS_MAP: Record<MediaType, string[]> = {
+  audio: ['mp3', 'wav', 'flac', 'ogg', 'wma', 'aac'],
+  image: ['jpg', 'jpeg', 'png', 'webp'],
+  video: ['mp3', 'wav', 'avi', 'mp4', 'mkv', 'mov', 'wmv', 'flv', 'gif', 'images'],
+};

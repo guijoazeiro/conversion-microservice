@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ConversionService } from '../service/conversion';
+import { ConversionService } from '../service/conversion/ConversionService';
 import { HttpError } from '../errors/HttpError';
 import { BAD_REQUEST_CODE, CREATED_CODE } from '../utils/constants';
 

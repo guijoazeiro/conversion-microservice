@@ -2,12 +2,13 @@ import { HttpError } from '../../errors/HttpError';
 import { convertQueue } from '../../jobs/convert.queue';
 import { TaskRepository } from '../../repositories/TaskRepository';
 import {
-  AUDIO_ALLOWED_FORMATS,
   BAD_REQUEST_CODE,
+  ALLOWED_FORMATS_MAP,
+  MediaType,
   STATUS_PENDING,
 } from '../../utils/constants';
 
-export class AudioService {
+export class ConversionService {
   constructor(private taskRepository = new TaskRepository()) {
     this.taskRepository = taskRepository;
   }
@@ -19,7 +20,18 @@ export class AudioService {
     file: Express.Multer.File;
     format: string;
   }) {
-    if (!AUDIO_ALLOWED_FORMATS.includes(format)) {
+    const mediaType = file.mimetype.split('/')[0] as MediaType;
+
+    const allowedFormats = ALLOWED_FORMATS_MAP[mediaType];
+
+    if (!allowedFormats) {
+      throw new HttpError(
+        'Formato de arquivo para ser convertido inválido',
+        BAD_REQUEST_CODE,
+      );
+    }
+
+    if (!allowedFormats.includes(format)) {
       throw new HttpError(
         'Formato de arquivo para ser convertido inválido',
         BAD_REQUEST_CODE,
@@ -46,9 +58,10 @@ export class AudioService {
       format,
       status: STATUS_PENDING,
     };
-    await this.taskRepository.create(fileObject);
 
+    await this.taskRepository.create(fileObject);
     await convertQueue.add('convert', fileObject);
+
     return { id };
   }
 }
