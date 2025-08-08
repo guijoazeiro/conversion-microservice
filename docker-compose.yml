@@ -86,13 +86,15 @@ services:
     networks:
       - conversion-network
 
-  conversion-worker-1:
+  light-worker-1:
     build: ./conversion-worker
-    container_name: conversion-worker-1
+    container_name: light-worker-1
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URI=mongodb://mongo:27017/converter
+      - WORKER_TYPE=light
+      - LIGHT_WORKERS=3  
     volumes:
       - conversion-files:/tmp
     depends_on:
@@ -105,14 +107,16 @@ services:
     restart: unless-stopped
     networks:
       - conversion-network
-  
-  conversion-worker-2:
+
+  light-worker-2:
     build: ./conversion-worker
-    container_name: conversion-worker-2
+    container_name: light-worker-2
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URI=mongodb://mongo:27017/converter
+      - WORKER_TYPE=light
+      - LIGHT_WORKERS=3
     volumes:
       - conversion-files:/tmp
     depends_on:
@@ -125,6 +129,61 @@ services:
     restart: unless-stopped
     networks:
       - conversion-network
+
+
+  heavy-worker-1:
+    build: ./conversion-worker
+    container_name: heavy-worker-1
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_URI=mongodb://mongo:27017/converter
+      - WORKER_TYPE=heavy
+      - HEAVY_WORKERS=2  
+    volumes:
+      - conversion-files:/tmp
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      conversion-api:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - conversion-network
+    deploy:
+      resources:
+        limits:
+          memory: 2G 
+          cpus: '1.5'
+
+  heavy-worker-2:
+    build: ./conversion-worker
+    container_name: heavy-worker-2
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_URI=mongodb://mongo:27017/converter
+      - WORKER_TYPE=heavy
+      - HEAVY_WORKERS=2
+    volumes:
+      - conversion-files:/tmp
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      conversion-api:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - conversion-network
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.5'
 
 volumes:
   mongo_data:

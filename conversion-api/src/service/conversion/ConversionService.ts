@@ -1,16 +1,20 @@
 import { HttpError } from '../../errors/HttpError';
-import { convertQueue } from '../../jobs/convert.queue';
 import { TaskRepository } from '../../repositories/TaskRepository';
+import QueueService from '../queue/QueueService';
 import {
   BAD_REQUEST_CODE,
   ALLOWED_FORMATS_MAP,
-  MediaType,
   STATUS_PENDING,
 } from '../../utils/constants';
+import { MediaType, Task } from '../../utils/types';
 
 export class ConversionService {
-  constructor(private taskRepository = new TaskRepository()) {
+  constructor(
+    private taskRepository = new TaskRepository(),
+    private queueService = new QueueService(),
+  ) {
     this.taskRepository = taskRepository;
+    this.queueService = queueService;
   }
 
   async process({
@@ -49,18 +53,33 @@ export class ConversionService {
 
     const id = file.filename.split('.')[0];
 
-    const fileObject = {
+    const conversionData = {
       id,
+      path: file.path,
+      mimetype: file.mimetype,
+      format,
+      fileSize: file.size,
       originalName: file.originalname,
       storedName: file.filename,
-      mimetype: file.mimetype,
-      path: file.path,
-      format,
       status: STATUS_PENDING,
     };
 
-    await this.taskRepository.create(fileObject);
-    await convertQueue.add('convert', fileObject);
+    const task = await this.taskRepository.create(conversionData);
+
+    if (!task) {
+      throw new HttpError('Erro ao criar tarefa', BAD_REQUEST_CODE);
+    }
+
+    const queueData = {
+      id: task._id.toString(),
+      path: conversionData.path,
+      mimetype: conversionData.mimetype,
+      format: conversionData.format,
+      fileSize: conversionData.fileSize,
+      status: conversionData.status,
+    };
+
+    await this.queueService.addConversionJob(queueData);
 
     return { id };
   }
