@@ -1,3 +1,5 @@
+import { MediaType } from './types';
+
 export const STATUS_PENDING = 'pending';
 export const STATUS_PROCESSING = 'processing';
 export const STATUS_DONE = 'done';
@@ -32,10 +34,19 @@ export const AUDIO_ALLOWED_FORMATS = [
   'aac',
 ];
 
-export type MediaType = 'audio' | 'image' | 'video';
-
 export const ALLOWED_FORMATS_MAP: Record<MediaType, string[]> = {
   audio: ['mp3', 'wav', 'flac', 'ogg', 'wma', 'aac'],
   image: ['jpg', 'jpeg', 'png', 'webp'],
-  video: ['mp3', 'wav', 'avi', 'mp4', 'mkv', 'mov', 'wmv', 'flv', 'gif', 'images'],
+  video: [
+    'mp3',
+    'wav',
+    'avi',
+    'mp4',
+    'mkv',
+    'mov',
+    'wmv',
+    'flv',
+    'gif',
+    'images',
+  ],
 };
