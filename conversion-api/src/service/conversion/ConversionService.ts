@@ -51,10 +51,7 @@ export class ConversionService {
       );
     }
 
-    const id = file.filename.split('.')[0];
-
     const conversionData = {
-      id,
       path: file.path,
       mimetype: file.mimetype,
       format,
@@ -71,7 +68,7 @@ export class ConversionService {
     }
 
     const queueData = {
-      id: task._id.toString(),
+      id: task.id,
       path: conversionData.path,
       mimetype: conversionData.mimetype,
       format: conversionData.format,
@@ -81,6 +78,6 @@ export class ConversionService {
 
     await this.queueService.addConversionJob(queueData);
 
-    return { id };
+    return task;
   }
 }

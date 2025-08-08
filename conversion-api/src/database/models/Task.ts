@@ -1,8 +1,27 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
+import { v7 as uuidv7 } from 'uuid';
 
-const TaskSchema = new Schema(
+interface ITask extends Document {
+  _id: string;
+  originalName?: string;
+  storedName?: string;
+  mimetype?: string;
+  path?: string;
+  format?: string;
+  inputPath?: string;
+  outputPath?: string;
+  outputName?: string;
+  status: 'pending' | 'processing' | 'done' | 'failed';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const TaskSchema = new Schema<ITask>(
   {
-    id: { type: String, required: true, unique: true },
+    _id: {
+      type: String,
+      default: () => uuidv7(),
+    },
     originalName: String,
     storedName: String,
     mimetype: String,
@@ -17,7 +36,28 @@ const TaskSchema = new Schema(
       default: 'pending',
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    id: false,
+    toJSON: {
+      virtuals: true,
+      transform: function (doc: any, ret: any) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: function (doc: any, ret: any) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
+  },
 );
 
-export const Task = model('Task', TaskSchema);
+export const Task = model<ITask>('Task', TaskSchema);
