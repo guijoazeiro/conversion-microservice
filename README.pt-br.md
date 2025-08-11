@@ -1,0 +1,278 @@
+# Conversão de Arquivos em Microsserviços
+
+[![Language](https://img.shields.io/badge/Language-English-blue)](README.md)
+[![Language](https://img.shields.io/badge/Language-Português-green)](#conversão-de-arquivos-em-microsserviços)
+
+Este projeto é uma implementação de um sistema de conversão de arquivos em microsserviços, utilizando Go e Node.js. O sistema é composto por dois microsserviços:
+
+1. **conversion-worker**: responsável por realizar a conversão de arquivos de vídeo e áudio, utilizando o FFmpeg.
+2. **conversion-api**: responsável por gerenciar as requisições de conversão de arquivos e interagir com o microsserviço de conversão.
+
+## Funcionalidades
+
+- Conversão de arquivos de vídeo e áudio em diferentes formatos
+- Gerenciamento de requisições de conversão de arquivos
+- Integração com o microsserviço de conversão
+- API RESTful com documentação Swagger
+- Processamento em fila com Redis
+- Armazenamento de metadados com MongoDB
+
+## Tecnologias Utilizadas
+
+- **Go (Golang)** para o microsserviço de conversão
+- **Node.js** com TypeScript para o microsserviço de API
+- **FFmpeg** para a conversão de arquivos de vídeo e áudio
+- **Redis** para a fila de requisições de conversão
+- **MongoDB** para armazenamento de metadados de arquivos
+
+## Pré-requisitos
+
+- Docker e Docker Compose instalados no sistema
+- Git instalado no sistema
+
+**OU** para instalação manual:
+- Go (Golang) instalado no sistema
+- Node.js instalado no sistema
+- FFmpeg instalado no sistema
+- Redis instalado e executando no sistema
+- MongoDB instalado e executando no sistema
+
+## Início Rápido com Docker (Recomendado)
+
+### 1. Clonar o Repositório
+```bash
+git clone https://github.com/guijoazeiro/conversion-microservice.git
+cd conversion-microservices
+```
+
+### 2. Executar com Docker Compose
+```bash
+# Iniciar todos os serviços (API, Worker, Redis, MongoDB)
+docker-compose up -d
+
+# Visualizar logs
+docker-compose logs -f
+
+# Parar todos os serviços
+docker-compose down
+```
+
+### 3. Acessar a Aplicação
+- **API**: http://localhost:3000
+- **Documentação Swagger**: http://localhost:3000/api-docs
+- **Health Check**: http://localhost:3000/health
+
+## Instalação e Configuração Manual
+
+Se preferir executar sem Docker:
+
+### 1. Clonar o Repositório
+```bash
+git clone https://github.com/guijoazeiro/conversion-microservice.git
+cd conversion-microservices
+```
+
+### 2. Configurar o Worker de Conversão (Go)
+```bash
+cd conversion-worker
+go mod download
+go build
+```
+
+### 3. Configurar a API de Conversão (Node.js)
+```bash
+cd conversion-api
+npm install
+```
+
+### 4. Configuração de Ambiente
+Crie arquivos `.env` em ambos os microsserviços com as configurações necessárias:
+
+**conversion-api/.env**
+```env
+PORT=3000
+UPLOAD_DIR=../tmp/input
+MONGO_URI=mongodb://mongo:27017/converter
+REDIS_URL=redis://localhost:6379
+```
+
+**conversion-worker/.env**
+```env
+REDIS_HOST=localhost
+REDIS_PORT=6379
+MONGO_URI=mongodb://localhost:27017/converter
+```
+
+## Executando os Serviços
+
+### Com Docker (Recomendado)
+Todos os serviços já estão executando se você usou `docker compose up --build -d`.
+
+### Configuração Manual
+
+### Iniciar o Serviço da API
+```bash
+cd conversion-api
+npm run dev
+```
+
+### Iniciar o Serviço Worker
+```bash
+cd conversion-worker
+go run main.go
+```
+
+## Documentação da API
+
+A documentação da API está disponível via Swagger UI em:
+```
+http://localhost:3000/api-docs
+```
+
+## Formatos Suportados
+
+### Conversão de Vídeos
+Os vídeos podem ser convertidos para os seguintes formatos:
+- `mp3` (extração de áudio)
+- `wav` (extração de áudio)
+- `avi`
+- `mp4`
+- `mkv`
+- `mov`
+- `wmv`
+- `flv`
+- `gif`
+- `images` (extração de frames)
+
+### Conversão de Imagens
+As imagens podem ser convertidas para os seguintes formatos:
+- `jpg`
+- `jpeg`
+- `png`
+- `webp`
+
+### Conversão de Áudio
+Os arquivos de áudio podem ser convertidos para os seguintes formatos:
+- `mp3`
+- `wav`
+- `flac`
+- `ogg`
+- `wma`
+- `aac`
+
+## Uso da API
+
+### Conversão de Arquivos
+Envie uma requisição POST para o endpoint `/api/convert` com o arquivo a ser convertido e o formato de saída desejado.
+
+#### Exemplo de Requisição
+```bash
+curl -X POST \
+  http://localhost:3000/api/convert \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@video.mp4' \
+  -F 'format=mp3'
+```
+
+#### Exemplo de Resposta
+```json
+{
+  "id": "019899dc-e5f0-77ef-b0e9-424d281933f3",
+  "originalName": "video.mp4",
+  "storedName": "f534874a-5783-48cc-8475-2d7d6a432962.mp4",
+  "mimetype": "video/mp4",
+  "path": "/tmp/input/f534874a-5783-48cc-8475-2d7d6a432962.mp4",
+  "format": "mp3",
+  "status": "pending",
+  "createdAt": "2025-08-11T16:00:47.603Z",
+  "updatedAt": "2025-08-11T16:00:47.603Z"
+}
+```
+
+### Verificar Status da Conversão
+```bash
+curl -X GET http://localhost:3000/api/file/status/{id}
+```
+
+### Baixar Arquivo Convertido
+```bash
+curl -X GET http://localhost:3000/api/file/download/{id} -o arquivo-convertido.mp3
+```
+
+### Listar Arquivos
+```bash
+curl -X GET "http://localhost:3000/api/file?format=mp3&status=completed&page=1&limit=10"
+```
+
+## Estrutura do Projeto
+
+```
+file-conversion-microservices/
+├── conversion-api/
+│   ├── docs/
+│   │   └── swagger.yaml
+│   ├── node_modules/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controller/
+│   │   ├── database/
+│   │   ├── errors/
+│   │   ├── jobs/
+│   │   ├── repositories/
+│   │   ├── routes/
+│   │   ├── service/
+│   │   ├── utils/
+│   │   ├── app.ts
+│   │   └── server.ts
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── .prettierrc
+│   ├── Dockerfile
+│   ├── package-lock.json
+│   ├── package.json
+│   └── tsconfig.json
+├── conversion-worker/
+│   ├── converter/
+│   │   ├── audio.go
+│   │   ├── converter.go
+│   │   ├── image.go
+│   │   └── video.go
+│   ├── database/
+│   │   ├── database.go
+│   │   └── .env.example
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   └── main.go
+├── .gitignore
+├── docker-compose.yml
+├── README.md
+└── README.pt-br.md
+```
+
+## Health Check
+
+Verificar se a API está executando:
+```bash
+curl -X GET http://localhost:3000/health
+```
+
+## Contribuição
+
+Contribuições são bem-vindas! Se você tiver alguma sugestão ou correção, por favor, abra uma issue ou envie um pull request.
+
+### Diretrizes de Desenvolvimento
+1. Faça um fork do repositório
+2. Crie uma branch para a funcionalidade (`git checkout -b feature/funcionalidade-incrivel`)
+3. Faça commit das suas mudanças (`git commit -m 'Adiciona funcionalidade incrível'`)
+4. Faça push para a branch (`git push origin feature/funcionalidade-incrivel`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto é licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Suporte
+
+Se você encontrar algum problema ou tiver dúvidas, por favor abra uma issue no GitHub.
