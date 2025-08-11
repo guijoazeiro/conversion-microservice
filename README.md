@@ -1,98 +1,278 @@
-# Conversão de Arquivos em Microsserviços
+# File Conversion Microservices
 
-Este projeto é uma implementação de um sistema de conversão de arquivos em microsserviços, utilizando Go e Node.js. O sistema é composto por dois microsserviços:
+[![Language](https://img.shields.io/badge/Language-English-blue)](#file-conversion-microservices)
+[![Language](https://img.shields.io/badge/Language-Português-green)](README.pt-br.md)
 
-1.  **conversion-worker**: responsável por realizar a conversão de arquivos de vídeo e áudio, utilizando o FFmpeg.
-2.  **conversion-api**: responsável por gerenciar as requisições de conversão de arquivos e interagir com o microsserviço de conversão.
+This project is a file conversion system implementation using microservices architecture with Go and Node.js. The system consists of two microservices:
 
-## Funcionalidades
+1. **conversion-worker**: responsible for performing video and audio file conversion using FFmpeg.
+2. **conversion-api**: responsible for managing file conversion requests and interacting with the conversion microservice.
 
-*   Conversão de arquivos de vídeo e áudio em diferentes formatos.
-*   Gerenciamento de requisições de conversão de arquivos.
-*   Integração com o microsserviço de conversão.
+## Features
 
-## Tecnologias Utilizadas
+- Video and audio file conversion to different formats
+- File conversion request management
+- Integration with conversion microservice
+- RESTful API with Swagger documentation
+- Queue-based processing with Redis
+- Metadata storage with MongoDB
 
-*   Go (Golang) para o microsserviço de conversão.
-*   Node.js para o microsserviço de API.
-*   FFmpeg para a conversão de arquivos de vídeo e áudio.
-*   Redis para a fila de requisições de conversão.
-*   MongoDB para armazenamento de metadados de arquivos.
+## Technologies Used
 
-## Instalação e Execução
+- **Go (Golang)** for the conversion microservice
+- **Node.js** with TypeScript for the API microservice
+- **FFmpeg** for video and audio file conversion
+- **Redis** for conversion request queuing
+- **MongoDB** for file metadata storage
 
-### Pré-requisitos
+## Prerequisites
 
-*   Go (Golang) instalado no sistema.
-*   Node.js instalado no sistema.
-*   FFmpeg instalado no sistema.
-*   Redis instalado e executando no sistema.
-*   MongoDB instalado e executando no sistema.
+- Docker and Docker Compose installed on the system
+- Git installed on the system
 
-### Passos para Instalação e Execução
+**OR** for manual installation:
+- Go (Golang) installed on the system
+- Node.js installed on the system
+- FFmpeg installed on the system
+- Redis installed and running on the system
+- MongoDB installed and running on the system
 
-1.  Clone o repositório do projeto.
-2.  Acesse o diretório do microsserviço de conversão (`conversion-worker`) e execute o comando `go build` para compilar o código.
-3.  Acesse o diretório do microsserviço de API (`conversion-api`) e execute o comando `npm install` para instalar as dependências.
-4.  Execute o comando `npm start` para iniciar o microsserviço de API.
-5.  Execute o comando `go run main.go` para iniciar o microsserviço de conversão.
-# Conversão de Arquivos
+## Quick Start with Docker (Recommended)
 
-## Conversão de Vídeos
-
-Os vídeos podem ser convertidos para os seguintes formatos:
-
-* `mp3`
-* `wav`
-* `avi`
-* `mp4`
-* `mkv`
-* `mov`
-* `wmv`
-* `flv`
-* `gif`
-* `images`
-
-## Conversão de Imagens
-
-As imagens podem ser convertidas para os seguintes formatos:
-
-* `jpg`
-* `jpeg`
-* `png`
-* `webp`
-
-## Conversão de Áudio
-
-Os arquivos de áudio podem ser convertidos para os seguintes formatos:
-
-* `mp3`
-* `wav`
-* `flac`
-* `ogg`
-* `wma`
-* `aac`
-
-## Uso
-
-### Requisições de Conversão
-
-*   Para realizar uma requisição de conversão, envie uma requisição POST para o endpoint `/convert` com o arquivo a ser convertido e o formato de saída desejado.
-*   O microsserviço de API irá gerenciar a requisição e interagir com o microsserviço de conversão para realizar a conversão do arquivo.
-
-### Exemplo de Requisição
-
+### 1. Clone the Repository
 ```bash
-curl -X POST \
-  http://localhost:3000/convert \
-  -H 'Content-Type: application/json' \
-  -d '{"file": "arquivo.mp4", "format": "mp3"}'
+git clone https://github.com/guijoazeiro/conversion-microservice.git
+cd conversion-microservices
 ```
 
-## Contribuição
+### 2. Run with Docker Compose
+```bash
+# Start all services (API, Worker, Redis, MongoDB)
+docker-compose up -d
 
-Contribuições são bem-vindas! Se você tiver alguma sugestão ou correção, por favor, abra uma issue ou envie um pull request.
+# View logs
+docker-compose logs -f
 
-## Licença
+# Stop all services
+docker-compose down
+```
 
-Este projeto é licenciado sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+### 3. Access the Application
+- **API**: http://localhost:3000
+- **Swagger Documentation**: http://localhost:3000/api-docs
+- **Health Check**: http://localhost:3000/health
+
+## Manual Installation and Setup
+
+If you prefer to run without Docker:
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/guijoazeiro/conversion-microservice.git
+cd conversion-microservices
+```
+
+### 2. Setup Conversion Worker (Go)
+```bash
+cd conversion-worker
+go mod download
+go build
+```
+
+### 3. Setup Conversion API (Node.js)
+```bash
+cd conversion-api
+npm install
+```
+
+### 4. Environment Configuration
+Create `.env` files in both microservices with the necessary configurations:
+
+**conversion-api/.env**
+```env
+PORT=3000
+UPLOAD_DIR=../tmp/input
+MONGO_URI=mongodb://mongo:27017/converter
+REDIS_URL=redis://localhost:6379
+```
+
+**conversion-worker/.env**
+```env
+REDIS_HOST=localhost
+REDIS_PORT=6379
+MONGO_URI=mongodb://localhost:27017/converter
+```
+
+## Running the Services
+
+### With Docker (Recommended)
+All services are already running if you used `docker compose up --build -d`.
+
+### Manual Setup
+
+### Start the API Service
+```bash
+cd conversion-api
+npm run dev
+```
+
+### Start the Worker Service
+```bash
+cd conversion-worker
+go run main.go
+```
+
+## API Documentation
+
+The API documentation is available via Swagger UI at:
+```
+http://localhost:3000/api-docs
+```
+
+## Supported Formats
+
+### Video Conversion
+Videos can be converted to the following formats:
+- `mp3` (audio extraction)
+- `wav` (audio extraction)
+- `avi`
+- `mp4`
+- `mkv`
+- `mov`
+- `wmv`
+- `flv`
+- `gif`
+- `images` (frame extraction)
+
+### Image Conversion
+Images can be converted to the following formats:
+- `jpg`
+- `jpeg`
+- `png`
+- `webp`
+
+### Audio Conversion
+Audio files can be converted to the following formats:
+- `mp3`
+- `wav`
+- `flac`
+- `ogg`
+- `wma`
+- `aac`
+
+## API Usage
+
+### File Conversion
+Send a POST request to the `/api/convert` endpoint with the file to be converted and the desired output format.
+
+#### Example Request
+```bash
+curl -X POST \
+  http://localhost:3000/api/convert \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@video.mp4' \
+  -F 'format=mp3'
+```
+
+#### Example Response
+```json
+{
+  "id": "019899dc-e5f0-77ef-b0e9-424d281933f3",
+  "originalName": "video.mp4",
+  "storedName": "f534874a-5783-48cc-8475-2d7d6a432962.mp4",
+  "mimetype": "video/mp4",
+  "path": "/tmp/input/f534874a-5783-48cc-8475-2d7d6a432962.mp4",
+  "format": "mp3",
+  "status": "pending",
+  "createdAt": "2025-08-11T16:00:47.603Z",
+  "updatedAt": "2025-08-11T16:00:47.603Z"
+}
+```
+
+### Check Conversion Status
+```bash
+curl -X GET http://localhost:3000/api/file/status/{id}
+```
+
+### Download Converted File
+```bash
+curl -X GET http://localhost:3000/api/file/download/{id} -o converted-file.mp3
+```
+
+### List Files
+```bash
+curl -X GET "http://localhost:3000/api/file?format=mp3&status=completed&page=1&limit=10"
+```
+
+## Project Structure
+
+```
+file-conversion-microservices/
+├── conversion-api/
+│   ├── docs/
+│   │   └── swagger.yaml
+│   ├── node_modules/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controller/
+│   │   ├── database/
+│   │   ├── errors/
+│   │   ├── jobs/
+│   │   ├── repositories/
+│   │   ├── routes/
+│   │   ├── service/
+│   │   ├── utils/
+│   │   ├── app.ts
+│   │   └── server.ts
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── .prettierrc
+│   ├── Dockerfile
+│   ├── package-lock.json
+│   ├── package.json
+│   └── tsconfig.json
+├── conversion-worker/
+│   ├── converter/
+│   │   ├── audio.go
+│   │   ├── converter.go
+│   │   ├── image.go
+│   │   └── video.go
+│   ├── database/
+│   │   ├── database.go
+│   │   └── .env.example
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   └── main.go
+├── .gitignore
+├── docker-compose.yml
+├── README.md
+└── README.pt-br.md
+```
+
+## Health Check
+
+Check if the API is running:
+```bash
+curl -X GET http://localhost:3000/health
+```
+
+## Contributing
+
+Contributions are welcome! If you have suggestions or corrections, please open an issue or submit a pull request.
+
+### Development Guidelines
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Support
+
+If you encounter any issues or have questions, please open an issue on GitHub.
