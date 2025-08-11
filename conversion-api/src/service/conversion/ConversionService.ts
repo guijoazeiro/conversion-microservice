@@ -68,7 +68,7 @@ export class ConversionService {
     }
 
     const queueData = {
-      id: task.id,
+      id: task._id,
       path: conversionData.path,
       mimetype: conversionData.mimetype,
       format: conversionData.format,

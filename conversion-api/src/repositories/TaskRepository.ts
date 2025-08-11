@@ -9,7 +9,7 @@ export class TaskRepository {
   }
 
   async findById(id: string) {
-    return Task.findOne({ id });
+    return Task.findOne({ _id: id });
   }
 
   async getFiles(params: {

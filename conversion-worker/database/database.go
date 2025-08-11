@@ -25,7 +25,7 @@ func (db *Database) UpdateStatus(id, status, output, filename string) {
 	if output != "" {
 		update["outputPath"] = output
 	}
-	_, err := db.tasksCol.UpdateOne(db.ctx, bson.M{"id": id}, bson.M{"$set": update})
+	_, err := db.tasksCol.UpdateOne(db.ctx, bson.M{"_id": id}, bson.M{"$set": update})
 	if err != nil {
 		log.Printf("Erro ao atualizar status de %s: %v\n", id, err)
 	}
