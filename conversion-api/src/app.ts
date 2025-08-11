@@ -13,7 +13,7 @@ app.use(express.json({ limit: '1gb' }));
 app.use(express.urlencoded({ extended: true, limit: '1gb' }));
 app.use(httpLogger);
 
-app.use('/api', convertRoutes);
+app.use('/api/convert', convertRoutes);
 app.use('/api/file', filesRoutes);
 
 app.get('/health', (req, res) => {

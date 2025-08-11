@@ -6,7 +6,7 @@ const router = Router();
 const convertController = new ConvertController();
 
 router.post(
-  '/convert',
+  '/',
   upload.single('file'),
   (req: Request, res: Response) => {
     convertController.handle(req, res);
