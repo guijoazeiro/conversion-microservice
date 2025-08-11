@@ -1,0 +1,413 @@
+openapi: 3.0.3
+info:
+  title: API de Conversão de Arquivos
+  description: API para conversão de arquivos entre diferentes formatos
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desenvolvimento
+  - url: https://api.example.com
+    description: Servidor de produção
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health Check
+      summary: Verificar saúde da aplicação
+      description: Endpoint para verificar se a aplicação está funcionando corretamente
+      responses:
+        '200':
+          description: Aplicação funcionando normalmente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2024-01-15T10:30:00.000Z"
+                  uptime:
+                    type: string
+                    example: "2h 30m 45s"
+                  version:
+                    type: string
+                    example: "1.0.0"
+
+  /api/convert:
+    post:
+      tags:
+        - Conversão
+      summary: Converter arquivo
+      description: Faz upload de um arquivo e inicia o processo de conversão para o formato especificado
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Arquivo a ser convertido
+                format:
+                  type: string
+                  description: Formato de destino para conversão
+                  example: "mkv"
+              required:
+                - file
+                - format
+      responses:
+        '201':
+          description: Conversão iniciada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileTask'
+        '400':
+          description: Requisição inválida (arquivo não enviado ou formato inválido)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                no_file:
+                  value:
+                    error: "Nenhum arquivo enviado"
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_error:
+                  value:
+                    error: "Erro ao converter arquivo"
+
+  /api/file:
+    get:
+      tags:
+        - Arquivos
+      summary: Listar arquivos
+      description: Retorna uma lista paginada de arquivos com filtros opcionais
+      parameters:
+        - name: status
+          in: query
+          description: Filtrar por status do arquivo
+          schema:
+            type: string
+            enum: [pending, processing, completed, error, done]
+        - name: format
+          in: query
+          description: Filtrar por formato do arquivo
+          schema:
+            type: string
+            example: "mkv"
+        - name: page
+          in: query
+          description: Número da página (começa em 1)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: Número de itens por página
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+            example: 10
+      responses:
+        '200':
+          description: Lista de arquivos retornada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileListResponse'
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_error:
+                  value:
+                    error: "Erro ao buscar arquivos"
+
+  /api/file/status/{id}:
+    get:
+      tags:
+        - Arquivos
+      summary: Verificar status do arquivo
+      description: Retorna o status atual de um arquivo específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único do arquivo
+          schema:
+            type: string
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Status do arquivo retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileStatusResponse'
+        '404':
+          description: Arquivo não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                not_found:
+                  value:
+                    error: "Arquivo não encontrado"
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_error:
+                  value:
+                    error: "Erro ao verificar status"
+
+  /api/file/download/{id}:
+    get:
+      tags:
+        - Arquivos
+      summary: Download do arquivo convertido
+      description: Faz o download de um arquivo convertido
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único do arquivo
+          schema:
+            type: string
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Arquivo retornado com sucesso
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: Nome do arquivo para download
+              schema:
+                type: string
+                example: 'attachment; filename="converted-file.mkv"'
+        '404':
+          description: Arquivo não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                not_found:
+                  value:
+                    error: "Arquivo não encontrado"
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_error:
+                  value:
+                    error: "Erro ao baixar arquivo"
+
+components:
+  schemas:
+    FileStatusResponse:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: Nome do arquivo processado
+          example: "0358b038-6d49-4bbe-8606-25d610bae130.mp4"
+        status:
+          type: string
+          enum: [pending, processing, completed, error, done]
+          description: Status atual do processamento
+          example: "done"
+
+    FileTask:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID único do arquivo
+          example: "019899dc-e5f0-77ef-b0e9-424d281933f3"
+        originalName:
+          type: string
+          description: Nome original do arquivo
+          example: "SampleVideo_1280x720_1mb.mp4"
+        storedName:
+          type: string
+          description: Nome do arquivo armazenado no sistema
+          example: "f534874a-5783-48cc-8475-2d7d6a432962.mp4"
+        mimetype:
+          type: string
+          description: Tipo MIME do arquivo
+          example: "video/mp4"
+        path:
+          type: string
+          description: Caminho do arquivo no sistema
+          example: "/tmp/input/f534874a-5783-48cc-8475-2d7d6a432962.mp4"
+        format:
+          type: string
+          description: Formato de destino para conversão
+          example: "mkv"
+        status:
+          type: string
+          enum: [pending, processing, completed, error, done]
+          description: Status atual da conversão
+          example: "pending"
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criação
+          example: "2025-08-11T16:00:47.603Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da última atualização
+          example: "2025-08-11T16:00:47.603Z"
+
+    FileStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID único do arquivo
+          example: "019899dc-e5f0-77ef-b0e9-424d281933f3"
+        originalName:
+          type: string
+          description: Nome original do arquivo
+          example: "SampleVideo_1280x720_1mb.mp4"
+        storedName:
+          type: string
+          description: Nome do arquivo armazenado no sistema
+          example: "f534874a-5783-48cc-8475-2d7d6a432962.mp4"
+        mimetype:
+          type: string
+          description: Tipo MIME do arquivo
+          example: "video/mp4"
+        path:
+          type: string
+          description: Caminho do arquivo no sistema
+          example: "/tmp/input/f534874a-5783-48cc-8475-2d7d6a432962.mp4"
+        format:
+          type: string
+          description: Formato de destino para conversão
+          example: "mkv"
+        status:
+          type: string
+          enum: [pending, processing, completed, error, done]
+          description: Status atual da conversão
+          example: "pending"
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criação
+          example: "2025-08-11T16:00:47.603Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da última atualização
+          example: "2025-08-11T16:00:47.603Z"
+
+    FileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileStatus'
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            totalItems:
+              type: integer
+              example: 13
+            totalPages:
+              type: integer
+              example: 2
+            hasNextPage:
+              type: boolean
+              example: true
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro
+          example: "Erro ao processar requisição"
+        code:
+          type: string
+          description: Código do erro (opcional)
+          example: "VALIDATION_ERROR"
+        details:
+          type: object
+          description: Detalhes adicionais do erro (opcional)
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    InternalServerError:
+      description: Erro interno do servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Health Check
+    description: Endpoints para verificação de saúde da aplicação
+  - name: Conversão
+    description: Endpoints para conversão de arquivos
+  - name: Arquivos
+    description: Endpoints para gerenciamento de arquivos convertidos
