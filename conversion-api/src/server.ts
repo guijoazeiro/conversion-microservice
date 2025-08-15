@@ -9,6 +9,7 @@ async function startServer() {
     await connectDB();
     app.listen(PORT, () => {
       logger.info(`Server running on http://localhost:${PORT}`);
+      logger.info(`Swagger running on http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
     logger.error(error);
