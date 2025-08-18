@@ -1,4 +1,24 @@
 services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: converter
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - conversion-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d converter"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   mongo:
     image: mongo:6
     container_name: mongo
@@ -70,16 +90,20 @@ services:
     environment:
       - PORT=3000
       - UPLOAD_DIR=/tmp/input
-      - MONGODB_URI=mongodb://mongo:27017/converter
-      - MONGO_URI=mongodb://mongo:27017/converter
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=converter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+      - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/converter
       - REDIS_URL=redis://redis:6379
     volumes:
       - conversion-files:/tmp
       - ./conversion-api:/app
       - /app/node_modules
     depends_on:
-      mongo:
-        condition: service_healthy
+      postgres:
+        condition: service_healthy      
       redis:
         condition: service_healthy
     restart: unless-stopped
@@ -186,6 +210,7 @@ services:
           cpus: '1.5'
 
 volumes:
+  postgres_data:
   mongo_data:
   conversion-files:
 
