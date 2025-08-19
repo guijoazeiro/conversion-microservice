@@ -10,13 +10,13 @@ export class FileService {
 
   async getStatus(id: string): Promise<{
     fileName: string | undefined;
-    status: "pending" | "processing" | "done" | "failed";   
+    status: 'pending' | 'processing' | 'done' | 'failed';
   }> {
     const task = await this.taskRepository.getTaskById(id);
     if (!task) {
       throw new HttpError('Arquivo não encontrado', NOT_FOUND_CODE);
     }
-    return { fileName: task.stored_name, status: task.status};
+    return { fileName: task.stored_name, status: task.status };
   }
 
   async download(id: string): Promise<string> {

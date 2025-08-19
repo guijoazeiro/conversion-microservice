@@ -17,10 +17,14 @@ app.use(httpLogger);
 
 const swaggerDocument = YAML.load(path.join(__dirname, '../docs/swagger.yaml'));
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "API de Conversão - Documentação"
-}));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'API de Conversão - Documentação',
+  }),
+);
 
 app.use('/api/convert', convertRoutes);
 app.use('/api/file', filesRoutes);
