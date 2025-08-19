@@ -58,7 +58,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION update_task_status_with_outbox(
-    p_task_id VARCHAR(255),
+    p_task_id UUID,
     p_new_status VARCHAR(50),
     p_output_path TEXT DEFAULT NULL
 ) RETURNS BOOLEAN AS $$
@@ -71,7 +71,7 @@ BEGIN
     WHERE id = p_task_id;
     
     IF old_status IS NULL THEN
-        RETURN FALSE
+        RETURN FALSE;
     END IF;    
    
     UPDATE conversion_tasks 
@@ -107,8 +107,8 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_pending_outbox_events(
     p_limit INTEGER DEFAULT 10
 ) RETURNS TABLE (
-    id VARCHAR(255),
-    aggregate_id VARCHAR(255),
+    id UUID,
+    aggregate_id UUID,
     event_type VARCHAR(100),
     event_data JSONB,
     created_at TIMESTAMP WITH TIME ZONE,
@@ -131,7 +131,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION mark_outbox_event_processed(
-    p_event_id VARCHAR(255)
+    p_event_id UUID
 ) RETURNS BOOLEAN AS $$
 BEGIN
     UPDATE outbox_events 
@@ -145,7 +145,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION mark_outbox_event_failed(
-    p_event_id VARCHAR(255),
+    p_event_id UUID,
     p_error_message TEXT
 ) RETURNS BOOLEAN AS $$
 DECLARE
