@@ -112,7 +112,8 @@ CREATE OR REPLACE FUNCTION get_pending_outbox_events(
     event_type VARCHAR(100),
     event_data JSONB,
     created_at TIMESTAMP WITH TIME ZONE,
-    retry_count INTEGER
+    retry_count INTEGER,
+    status VARCHAR(50)
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -122,7 +123,8 @@ BEGIN
         oe.event_type,
         oe.event_data,
         oe.created_at,
-        oe.retry_count
+        oe.retry_count,
+        oe.status
     FROM outbox_events oe
     WHERE oe.status = 'pending'
     ORDER BY oe.created_at ASC
