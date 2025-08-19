@@ -11,8 +11,8 @@ import path from 'path';
 
 const app = express();
 
-app.use(express.json({ limit: '1gb' }));
-app.use(express.urlencoded({ extended: true, limit: '1gb' }));
+app.use(express.json({ limit: '2gb' }));
+app.use(express.urlencoded({ extended: true, limit: '2gb' }));
 app.use(httpLogger);
 
 const swaggerDocument = YAML.load(path.join(__dirname, '../docs/swagger.yaml'));
