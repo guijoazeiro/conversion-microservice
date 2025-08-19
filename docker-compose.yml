@@ -109,7 +109,32 @@ services:
     restart: unless-stopped
     networks:
       - conversion-network
-
+  outbox-processor:
+    build: ./outbox-processor
+    container_name: outbox-processor
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=converter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+      - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/converter
+      - REDIS_URL=redis://redis:6379
+      - PROCESSOR_INTERVAL=5000
+      - PROCESSOR_BATCH_SIZE=10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - conversion-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('net').createConnection({host: process.env.POSTGRES_HOST, port: process.env.POSTGRES_PORT}).on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   light-worker-1:
     build: ./conversion-worker
     container_name: light-worker-1
