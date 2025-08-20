@@ -64,7 +64,6 @@ export default class QueueService {
         backoff: { type: "exponential", delay: 5000 },
         removeOnComplete: 50,
         removeOnFail: 25,
-        delay: this.calculateDelay(file_size),
       });
       logger.info(
         `Job ${jobData.id} adicionado a fila HEAVY ${this.formatFileSizeAuto(file_size)}`,
@@ -103,7 +102,7 @@ export default class QueueService {
       await this.connection.ping();
       return true;
     } catch (error) {
-      logger.error("Redis health check failed:", error);
+      logger.error("Redis health check falhou:", error);
       return false;
     }
   }
@@ -151,7 +150,7 @@ export default class QueueService {
 
       return status;
     } catch (error) {
-      logger.error("Error getting queue status:", error);
+      logger.error("Erro ao obter status das filas:", error);
       throw error;
     }
   }
@@ -166,7 +165,7 @@ export default class QueueService {
       }
       await this.connection.quit();
     } catch (error) {
-      logger.error("Error closing connections:", error);
+      logger.error("Erro ao fechar conexão com o Redis:", error);
       this.connection.disconnect();
     }
   }

@@ -19,7 +19,7 @@ CREATE TABLE conversion_tasks (
   output_path TEXT,
   output_size BIGINT,
   
-  CONSTRAINT chk_status CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled'))
+  CONSTRAINT chk_status CHECK (status IN ('pending', 'queued', 'processing', 'completed', 'failed', 'cancelled'))
 );
 
 CREATE TABLE outbox_events (
@@ -44,6 +44,7 @@ CREATE INDEX idx_conversion_tasks_status ON conversion_tasks(status);
 CREATE INDEX idx_conversion_tasks_created_at ON conversion_tasks(created_at);
 CREATE INDEX idx_conversion_tasks_format ON conversion_tasks(format);
 CREATE INDEX idx_conversion_tasks_mimetype ON conversion_tasks(mimetype);
+CREATE INDEX idx_conversion_tasks_queued ON conversion_tasks(status, created_at) WHERE status = 'queued';
 
 CREATE INDEX idx_outbox_events_status ON outbox_events(status);
 CREATE INDEX idx_outbox_events_created_at ON outbox_events(created_at);

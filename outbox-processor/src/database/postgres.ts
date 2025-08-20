@@ -37,6 +37,21 @@ class PostgresDatabase {
 
   async getUnprocessedEvents(limit: number = 10) {
     const result = await this.query(
+      "SELECT * FROM get_pending_conversion_events($1)",
+      [limit],
+    );
+    return result.rows;
+  }
+
+  async markTaskQueued(taskId: string) {
+    const result = await this.query("SELECT mark_task_queued($1) as success", [
+      taskId,
+    ]);
+    return result.rows[0]?.success || false;
+  }
+
+  async getAllUnprocessedEvents(limit: number = 10) {
+    const result = await this.query(
       "SELECT * FROM get_pending_outbox_events($1)",
       [limit],
     );

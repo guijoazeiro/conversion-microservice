@@ -43,18 +43,30 @@ class OutboxProcessor {
   private async processEvents() {
     const events = await database.getUnprocessedEvents(BATCH_SIZE);
 
+    if (events.length === 0) {
+      logger.debug("Nenhum evento de conversão pendente encontrado");
+      return;
+    }
+
+    logger.info(`Processando ${events.length} evento(s) de conversão...`);
+
     for (const event of events) {
-      logger.info("Processando eventos...");
-      logger.info(`Encontrados ${events.length} eventos para processar`);
       try {
         await queueService.addConversionJob(event.event_data);
 
-        const marked = await database.markEventProcessed(event.id);
-        if (!marked) {
+        const taskQueued = await database.markTaskQueued(event.aggregate_id);
+        if (!taskQueued) {
+          logger.warn(
+            `Tarefa ${event.aggregate_id} não foi marcada como queued (pode já ter sido processada)`,
+          );
+        }
+
+        const eventProcessed = await database.markEventProcessed(event.id);
+        if (!eventProcessed) {
           logger.warn(`Evento ${event.id} não foi marcado como processado`);
         } else {
           logger.info(
-            `Evento ${event.id} enviado para a fila e marcado como processado`,
+            `Tarefa ${event.aggregate_id} enviada para a fila e marcada como queued`,
           );
         }
       } catch (err: any) {

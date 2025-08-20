@@ -104,6 +104,35 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION get_pending_conversion_events(
+    p_limit INTEGER DEFAULT 10
+) RETURNS TABLE (
+    id UUID,
+    aggregate_id UUID,
+    event_type VARCHAR(100),
+    event_data JSONB,
+    created_at TIMESTAMP WITH TIME ZONE,
+    retry_count INTEGER,
+    status VARCHAR(50)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        oe.id,
+        oe.aggregate_id,
+        oe.event_type,
+        oe.event_data,
+        oe.created_at,
+        oe.retry_count,
+        oe.status
+    FROM outbox_events oe
+    WHERE oe.status = 'pending'
+    AND oe.event_type = 'CONVERSION_REQUESTED'
+    ORDER BY oe.created_at ASC
+    LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION get_pending_outbox_events(
     p_limit INTEGER DEFAULT 10
 ) RETURNS TABLE (
@@ -180,6 +209,20 @@ BEGIN
             status = 'failed'
         WHERE id = p_event_id;
     END IF;
+    
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION mark_task_queued(
+    p_task_id UUID
+) RETURNS BOOLEAN AS $$
+BEGIN
+    UPDATE conversion_tasks 
+    SET 
+        status = 'queued',
+        updated_at = NOW()
+    WHERE id = p_task_id AND status = 'pending';
     
     RETURN FOUND;
 END;
