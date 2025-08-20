@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { FileService } from '../service/file/FileService';
 import { HttpError } from '../errors/HttpError';
 import { INTERNAL_SERVER_ERROR_CODE } from '../utils/constants';
+import logger from '../config/logger';
 
 export class FileController {
   constructor(private fileService = new FileService()) {
@@ -48,7 +49,7 @@ export class FileController {
       });
       res.json(result);
     } catch (error) {
-      console.error(error); // Log do erro para debug
+      logger.error(error);
       res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .json({ error: 'Erro ao buscar arquivos' });

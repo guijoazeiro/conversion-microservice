@@ -5,11 +5,7 @@ import { upload } from '../config/multer';
 const router = Router();
 const convertController = new ConvertController();
 
-router.post(
-  '/',
-  upload.single('file'),
-  (req: Request, res: Response) => {
-    convertController.handle(req, res);
-  },
-);
+router.post('/', upload.single('file'), (req: Request, res: Response) => {
+  convertController.handle(req, res);
+});
 export default router;

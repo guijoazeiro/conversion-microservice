@@ -1,7 +1,6 @@
-import http from 'http';
 import app from './app';
 import { PORT } from './config/enviroment';
-import { connectDB } from './database/connection';
+import { connectDB } from './database/connectCheck';
 import logger from './config/logger';
 
 async function startServer() {

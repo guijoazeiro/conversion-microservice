@@ -27,10 +27,10 @@ var (
 )
 
 type JobData struct {
-	ID       string `json:"id"`
-	Path     string `json:"path"`
-	Mimetype string `json:"mimetype"`
-	Format   string `json:"format"`
+	ID        string `json:"id"`
+	InputPath string `json:"input_path"`
+	Mimetype  string `json:"mimetype"`
+	Format    string `json:"format"`
 }
 
 type Worker struct {
@@ -182,10 +182,10 @@ func (w *Worker) processJob() error {
 		fileName = fmt.Sprintf("%s.%s", job.ID, job.Format)
 	}
 
-	outputPath := fmt.Sprintf("../tmp/output/%s", fileName)
+	outputPath := fmt.Sprintf("/tmp/output/%s", fileName)
 
 	start := time.Now()
-	err = handler.Convert(job.Path, job.Format, outputPath)
+	err = handler.Convert(job.InputPath, job.Format, outputPath)
 	duration := time.Since(start)
 
 	if err != nil {
@@ -195,7 +195,7 @@ func (w *Worker) processJob() error {
 	}
 
 	log.Printf("Worker %d [%s] - Job [%s] concluído em %v! Output: %s", w.id, queueType, job.ID, duration, outputPath)
-	w.db.UpdateStatus(job.ID, "done", outputPath, fileName)
+	w.db.UpdateStatus(job.ID, "completed", outputPath, fileName)
 
 	return nil
 }

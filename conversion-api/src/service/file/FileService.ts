@@ -10,29 +10,29 @@ export class FileService {
 
   async getStatus(id: string): Promise<{
     fileName: string | undefined;
-    status: "pending" | "processing" | "done" | "failed";
+    status: 'pending' | 'processing' | 'done' | 'failed';
   }> {
-    const task = await this.taskRepository.findById(id);
+    const task = await this.taskRepository.getTaskById(id);
     if (!task) {
       throw new HttpError('Arquivo não encontrado', NOT_FOUND_CODE);
     }
-    return { fileName: task.storedName, status: task.status };
+    return { fileName: task.stored_name, status: task.status };
   }
 
   async download(id: string): Promise<string> {
-    const file = await this.taskRepository.findById(id);
+    const file = await this.taskRepository.getTaskById(id);
     if (!file) {
       throw new HttpError('Arquivo não encontrado', NOT_FOUND_CODE);
     }
-    if (file.status !== 'done') {
+    if (file.status !== 'completed') {
       throw new HttpError('Arquivo ainda não convertido', BAD_REQUEST_CODE);
     }
 
-    if (!file.outputPath || !existsSync(file.outputPath)) {
+    if (!file.output_path || !existsSync(file.output_path)) {
       throw new HttpError('Arquivo não encontrado', BAD_REQUEST_CODE);
     }
 
-    return file.outputPath;
+    return file.output_path;
   }
 
   async getFiles(params: {
@@ -48,7 +48,7 @@ export class FileService {
     if (status) query.status = status;
     if (format) query.format = format;
 
-    return await this.taskRepository.getFiles({
+    return await this.taskRepository.getTaskFiles({
       query,
       skip,
       limit,
