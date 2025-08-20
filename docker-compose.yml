@@ -120,7 +120,7 @@ services:
       - POSTGRES_PASSWORD=postgres123
       - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/converter
       - REDIS_URL=redis://redis:6379
-      - PROCESSOR_INTERVAL=5000
+      - PROCESSOR_INTERVAL=10000
       - PROCESSOR_BATCH_SIZE=10
     depends_on:
       postgres:
@@ -139,14 +139,22 @@ services:
     build: ./conversion-worker
     container_name: light-worker-1
     environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=converter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URI=mongodb://mongo:27017/converter
       - WORKER_TYPE=light
-      - LIGHT_WORKERS=3  
+      - LIGHT_WORKERS=3
+
     volumes:
       - conversion-files:/tmp
     depends_on:
+      postgres:
+        condition: service_healthy
       mongo:
         condition: service_healthy
       redis:
@@ -161,6 +169,11 @@ services:
     build: ./conversion-worker
     container_name: light-worker-2
     environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=converter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URI=mongodb://mongo:27017/converter
@@ -169,6 +182,8 @@ services:
     volumes:
       - conversion-files:/tmp
     depends_on:
+      postgres:
+        condition: service_healthy
       mongo:
         condition: service_healthy
       redis:
@@ -184,6 +199,11 @@ services:
     build: ./conversion-worker
     container_name: heavy-worker-1
     environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=converter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URI=mongodb://mongo:27017/converter
@@ -192,6 +212,8 @@ services:
     volumes:
       - conversion-files:/tmp
     depends_on:
+      postgres:
+        condition: service_healthy
       mongo:
         condition: service_healthy
       redis:
@@ -211,6 +233,11 @@ services:
     build: ./conversion-worker
     container_name: heavy-worker-2
     environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=converter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URI=mongodb://mongo:27017/converter
@@ -219,6 +246,8 @@ services:
     volumes:
       - conversion-files:/tmp
     depends_on:
+      postgres:
+        condition: service_healthy
       mongo:
         condition: service_healthy
       redis:
