@@ -24,11 +24,11 @@ export class FileService {
     if (!file) {
       throw new HttpError('Arquivo não encontrado', NOT_FOUND_CODE);
     }
-    if (file.status !== 'done') {
+    if (file.status !== 'completed') {
       throw new HttpError('Arquivo ainda não convertido', BAD_REQUEST_CODE);
     }
 
-    if (!file.output_path || !existsSync(file.outputPath)) {
+    if (!file.output_path || !existsSync(file.output_path)) {
       throw new HttpError('Arquivo não encontrado', BAD_REQUEST_CODE);
     }
 

@@ -182,7 +182,7 @@ func (w *Worker) processJob() error {
 		fileName = fmt.Sprintf("%s.%s", job.ID, job.Format)
 	}
 
-	outputPath := fmt.Sprintf("../tmp/output/%s", fileName)
+	outputPath := fmt.Sprintf("/tmp/output/%s", fileName)
 
 	start := time.Now()
 	err = handler.Convert(job.InputPath, job.Format, outputPath)
