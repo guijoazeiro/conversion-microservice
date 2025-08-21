@@ -6,7 +6,8 @@
 This project is a file conversion system implementation using microservices architecture with Go and Node.js. The system consists of two microservices:
 
 1. **conversion-worker**: responsible for performing video and audio file conversion using FFmpeg.
-2. **conversion-api**: responsible for managing file conversion requests and interacting with the conversion microservice.
+2. **conversion-api**: responsible for managing file conversion requests and interacting with the conversion microservice and storing metadata.
+3. **outbox**: responsible for outbox pattern implementation using Redis and PostgreSQL.
 
 ## Features
 
@@ -15,7 +16,8 @@ This project is a file conversion system implementation using microservices arch
 - Integration with conversion microservice
 - RESTful API with Swagger documentation
 - Queue-based processing with Redis
-- Metadata storage with MongoDB
+- Metadata storage with PostgreSQL
+- Outbox pattern implementation
 
 ## Technologies Used
 
@@ -23,7 +25,7 @@ This project is a file conversion system implementation using microservices arch
 - **Node.js** with TypeScript for the API microservice
 - **FFmpeg** for video and audio file conversion
 - **Redis** for conversion request queuing
-- **MongoDB** for file metadata storage
+- **PostgreSQL** for file metadata storage
 
 ## Prerequisites
 
@@ -35,7 +37,7 @@ This project is a file conversion system implementation using microservices arch
 - Node.js installed on the system
 - FFmpeg installed on the system
 - Redis installed and running on the system
-- MongoDB installed and running on the system
+- PostgreSQL installed and running on the system
 
 ## Quick Start with Docker (Recommended)
 
@@ -47,7 +49,7 @@ cd conversion-microservices
 
 ### 2. Run with Docker Compose
 ```bash
-# Start all services (API, Worker, Redis, MongoDB)
+# Start all services (API, Worker, Redis, PostgreSQL)
 docker-compose up -d
 
 # View logs
@@ -86,21 +88,41 @@ npm install
 ```
 
 ### 4. Environment Configuration
-Create `.env` files in both microservices with the necessary configurations:
+"Create `.env` files for all three microservices with their necessary configurations."
 
 **conversion-api/.env**
 ```env
 PORT=3000
 UPLOAD_DIR=../tmp/input
-MONGO_URI=mongodb://mongo:27017/converter
 REDIS_URL=redis://localhost:6379
+PG_HOST=localhost
+PG_PORT=5432
+PG_USER=postgres
+PG_PASSWORD=postgres123
+PG_DATABASE=converter9
 ```
 
 **conversion-worker/.env**
 ```env
 REDIS_HOST=localhost
 REDIS_PORT=6379
-MONGO_URI=mongodb://localhost:27017/converter
+PG_HOST=localhost
+PG_PORT=5432
+PG_USER=postgres
+PG_PASSWORD=postgres123
+PG_DATABASE=conversion
+```
+
+**outbox-processor/.env**
+```env
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=converter
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres123
+REDIS_URL=redis://localhost:6379
+PROCESSOR_INTERVAL=500
+BATCH_SIZE=10
 ```
 
 ## Running the Services
@@ -239,12 +261,28 @@ file-conversion-microservices/
 │   │   └── video.go
 │   ├── database/
 │   │   ├── database.go
-│   │   └── .env.example
+│   |── .env.example
 │   ├── .gitignore
 │   ├── Dockerfile
 │   ├── go.mod
 │   ├── go.sum
 │   └── main.go
+├── int-db/
+│   ├── 01_init_tables.sql
+│   └── 02_functions.sql
+├── outbox-processor/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── environment.ts
+│   │   │   ├── logger.ts
+│   │   │   └── redis.ts
+│   │   ├── database/
+│   │   │   └── postgres.ts
+│   │   ├── queue/
+│   │   │   └── redis.ts
+│   │   ├── index.ts
+│   └── env.example
+│   
 ├── .gitignore
 ├── docker-compose.yml
 ├── README.md

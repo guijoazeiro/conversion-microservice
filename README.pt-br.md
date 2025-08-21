@@ -1,29 +1,31 @@
 # Conversão de Arquivos em Microsserviços
 
-[![Language](https://img.shields.io/badge/Language-English-blue)](README.md)
-[![Language](https://img.shields.io/badge/Language-Português-green)](#conversão-de-arquivos-em-microsserviços)
+[![Language](https://img.shields.io/badge/Language-English-blue)](#file-conversion-microservices)
+[![Language](https://img.shields.io/badge/Language-Português-green)](README.pt-br.md)
 
-Este projeto é uma implementação de um sistema de conversão de arquivos em microsserviços, utilizando Go e Node.js. O sistema é composto por dois microsserviços:
+Este projeto é uma implementação de um sistema de conversão de arquivos usando arquitetura de microsserviços com Go e Node.js. O sistema é composto por três microsserviços:
 
-1. **conversion-worker**: responsável por realizar a conversão de arquivos de vídeo e áudio, utilizando o FFmpeg.
-2. **conversion-api**: responsável por gerenciar as requisições de conversão de arquivos e interagir com o microsserviço de conversão.
+1. **conversion-worker**: responsável por realizar a conversão de arquivos de vídeo e áudio utilizando o FFmpeg.
+2. **conversion-api**: responsável por gerenciar as requisições de conversão de arquivos e interagir com o microsserviço de conversão e armazenar metadados.
+3. **outbox**: responsável pela implementação do padrão outbox usando Redis e PostgreSQL.
 
 ## Funcionalidades
 
-- Conversão de arquivos de vídeo e áudio em diferentes formatos
+- Conversão de arquivos de vídeo e áudio para diferentes formatos
 - Gerenciamento de requisições de conversão de arquivos
-- Integração com o microsserviço de conversão
+- Integração com microsserviço de conversão
 - API RESTful com documentação Swagger
-- Processamento em fila com Redis
-- Armazenamento de metadados com MongoDB
+- Processamento baseado em fila com Redis
+- Armazenamento de metadados com PostgreSQL
+- Implementação do padrão outbox
 
 ## Tecnologias Utilizadas
 
 - **Go (Golang)** para o microsserviço de conversão
 - **Node.js** com TypeScript para o microsserviço de API
-- **FFmpeg** para a conversão de arquivos de vídeo e áudio
-- **Redis** para a fila de requisições de conversão
-- **MongoDB** para armazenamento de metadados de arquivos
+- **FFmpeg** para conversão de arquivos de vídeo e áudio
+- **Redis** para fila de requisições de conversão
+- **PostgreSQL** para armazenamento de metadados de arquivos
 
 ## Pré-requisitos
 
@@ -35,7 +37,7 @@ Este projeto é uma implementação de um sistema de conversão de arquivos em m
 - Node.js instalado no sistema
 - FFmpeg instalado no sistema
 - Redis instalado e executando no sistema
-- MongoDB instalado e executando no sistema
+- PostgreSQL instalado e executando no sistema
 
 ## Início Rápido com Docker (Recomendado)
 
@@ -47,7 +49,7 @@ cd conversion-microservices
 
 ### 2. Executar com Docker Compose
 ```bash
-# Iniciar todos os serviços (API, Worker, Redis, MongoDB)
+# Iniciar todos os serviços (API, Worker, Redis, PostgreSQL)
 docker-compose up -d
 
 # Visualizar logs
@@ -86,21 +88,41 @@ npm install
 ```
 
 ### 4. Configuração de Ambiente
-Crie arquivos `.env` em ambos os microsserviços com as configurações necessárias:
+"Crie arquivos `.env` para os três microsserviços com suas configurações necessárias."
 
 **conversion-api/.env**
 ```env
 PORT=3000
 UPLOAD_DIR=../tmp/input
-MONGO_URI=mongodb://mongo:27017/converter
 REDIS_URL=redis://localhost:6379
+PG_HOST=localhost
+PG_PORT=5432
+PG_USER=postgres
+PG_PASSWORD=postgres123
+PG_DATABASE=converter9
 ```
 
 **conversion-worker/.env**
 ```env
 REDIS_HOST=localhost
 REDIS_PORT=6379
-MONGO_URI=mongodb://localhost:27017/converter
+PG_HOST=localhost
+PG_PORT=5432
+PG_USER=postgres
+PG_PASSWORD=postgres123
+PG_DATABASE=conversion
+```
+
+**outbox-processor/.env**
+```env
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=converter
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres123
+REDIS_URL=redis://localhost:6379
+PROCESSOR_INTERVAL=500
+BATCH_SIZE=10
 ```
 
 ## Executando os Serviços
@@ -239,12 +261,28 @@ file-conversion-microservices/
 │   │   └── video.go
 │   ├── database/
 │   │   ├── database.go
-│   │   └── .env.example
+│   |── .env.example
 │   ├── .gitignore
 │   ├── Dockerfile
 │   ├── go.mod
 │   ├── go.sum
 │   └── main.go
+├── int-db/
+│   ├── 01_init_tables.sql
+│   └── 02_functions.sql
+├── outbox-processor/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── environment.ts
+│   │   │   ├── logger.ts
+│   │   │   └── redis.ts
+│   │   ├── database/
+│   │   │   └── postgres.ts
+│   │   ├── queue/
+│   │   │   └── redis.ts
+│   │   ├── index.ts
+│   └── env.example
+│   
 ├── .gitignore
 ├── docker-compose.yml
 ├── README.md
@@ -260,7 +298,7 @@ curl -X GET http://localhost:3000/health
 
 ## Contribuição
 
-Contribuições são bem-vindas! Se você tiver alguma sugestão ou correção, por favor, abra uma issue ou envie um pull request.
+Contribuições são bem-vindas! Se você tiver sugestões ou correções, por favor, abra uma issue ou envie um pull request.
 
 ### Diretrizes de Desenvolvimento
 1. Faça um fork do repositório
@@ -275,4 +313,4 @@ Este projeto é licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE)
 
 ## Suporte
 
-Se você encontrar algum problema ou tiver dúvidas, por favor abra uma issue no GitHub.
+Se você encontrar algum problema ou tiver dúvidas, por favor, abra uma issue no GitHub.
