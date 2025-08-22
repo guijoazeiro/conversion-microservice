@@ -216,11 +216,12 @@ curl -X POST \
 ```json
 {
   "id": "019899dc-e5f0-77ef-b0e9-424d281933f3",
-  "originalName": "video.mp4",
-  "storedName": "f534874a-5783-48cc-8475-2d7d6a432962.mp4",
+  "original_name": "SampleVideo_1280x720_1mb.mp4",
+  "stored_name": "f534874a-5783-48cc-8475-2d7d6a432962.mp4",
+  "input_path": "/tmp/input/f534874a-5783-48cc-8475-2d7d6a432962.mp4",
   "mimetype": "video/mp4",
-  "path": "/tmp/input/f534874a-5783-48cc-8475-2d7d6a432962.mp4",
-  "format": "mp3",
+  "format": "mkv",
+  "file_size": 1055736,
   "status": "pending",
   "createdAt": "2025-08-11T16:00:47.603Z",
   "updatedAt": "2025-08-11T16:00:47.603Z"

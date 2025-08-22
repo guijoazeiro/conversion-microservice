@@ -261,26 +261,30 @@ components:
           type: string
           description: ID único do arquivo
           example: "019899dc-e5f0-77ef-b0e9-424d281933f3"
-        originalName:
+        original_name:
           type: string
           description: Nome original do arquivo
           example: "SampleVideo_1280x720_1mb.mp4"
-        storedName:
+        stored_name:
           type: string
           description: Nome do arquivo armazenado no sistema
           example: "f534874a-5783-48cc-8475-2d7d6a432962.mp4"
+        input_path:
+          type: string
+          description: Caminho do arquivo no sistema
+          example: "/tmp/input/f534874a-5783-48cc-8475-2d7d6a432962.mp4"
         mimetype:
           type: string
           description: Tipo MIME do arquivo
           example: "video/mp4"
-        path:
-          type: string
-          description: Caminho do arquivo no sistema
-          example: "/tmp/input/f534874a-5783-48cc-8475-2d7d6a432962.mp4"
         format:
           type: string
           description: Formato de destino para conversão
           example: "mkv"
+        file_size:
+          type: number
+          description: Tamanho do arquivo em bytes
+          example: 1055736  
         status:
           type: string
           enum: [pending, processing, completed, error, done]
