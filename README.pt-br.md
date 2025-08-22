@@ -17,7 +17,23 @@ Este projeto é uma implementação de um sistema de conversão de arquivos usan
 - API RESTful com documentação Swagger
 - Processamento baseado em fila com Redis
 - Armazenamento de metadados com PostgreSQL
-- Implementação do padrão outbox
+- Implementação do padrão outbox para garantia de consistência
+
+## Padrão Outbox
+
+Este projeto implementa o **padrão outbox** para garantir que todos os arquivos enviados sejam processados de forma confiável, mesmo em cenários de falhas temporárias.
+
+### Como Funciona
+1. **Atomicidade**: Quando um arquivo é enviado, os dados são salvos na tabela `conversion_tasks` e um evento é criado na tabela `outbox_events` em uma única transação
+2. **Processamento Assíncrono**: O `outbox-processor` monitora eventos pendentes e os envia para as filas Redis apropriadas
+3. **Garantia de Entrega**: Se houver falhas temporárias (Redis fora do ar, problemas de rede), os eventos permanecem pendentes até serem processados com sucesso
+4. **Sistema de Retry**: Eventos falhos são reprocessados automaticamente até um limite máximo de tentativas
+
+### Benefícios
+- **Zero perda de arquivos**: Todo upload é garantidamente processado
+- **Resiliência a falhas**: Sistema se recupera automaticamente de problemas temporários
+- **Observabilidade**: Histórico completo de eventos para auditoria e debugging
+- **Extensibilidade**: Facilita adição de novos consumidores de eventos (webhooks, notificações, etc.)
 
 ## Tecnologias Utilizadas
 

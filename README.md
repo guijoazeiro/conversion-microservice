@@ -3,7 +3,7 @@
 [![Language](https://img.shields.io/badge/Language-English-blue)](#file-conversion-microservices)
 [![Language](https://img.shields.io/badge/Language-Português-green)](README.pt-br.md)
 
-This project is a file conversion system implementation using microservices architecture with Go and Node.js. The system consists of two microservices:
+This project is a file conversion system implementation using microservices architecture with Go and Node.js. The system consists of three microservices:
 
 1. **conversion-worker**: responsible for performing video and audio file conversion using FFmpeg.
 2. **conversion-api**: responsible for managing file conversion requests and interacting with the conversion microservice and storing metadata.
@@ -17,7 +17,23 @@ This project is a file conversion system implementation using microservices arch
 - RESTful API with Swagger documentation
 - Queue-based processing with Redis
 - Metadata storage with PostgreSQL
-- Outbox pattern implementation
+- Outbox pattern implementation for consistency guarantees
+
+## Outbox Pattern
+
+This project implements the **outbox pattern** to ensure that all uploaded files are processed reliably, even in scenarios with temporary failures.
+
+### How It Works
+1. **Atomicity**: When a file is uploaded, data is saved to the `conversion_tasks` table and an event is created in the `outbox_events` table in a single transaction
+2. **Asynchronous Processing**: The `outbox-processor` monitors pending events and sends them to the appropriate Redis queues
+3. **Delivery Guarantee**: If there are temporary failures (Redis down, network issues), events remain pending until successfully processed
+4. **Retry System**: Failed events are automatically reprocessed up to a maximum retry limit
+
+### Benefits
+- **Zero file loss**: Every upload is guaranteed to be processed
+- **Fault resilience**: System automatically recovers from temporary issues
+- **Observability**: Complete event history for auditing and debugging
+- **Extensibility**: Facilitates adding new event consumers (webhooks, notifications, etc.)
 
 ## Technologies Used
 
