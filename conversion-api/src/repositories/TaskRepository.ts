@@ -46,6 +46,10 @@ export class TaskRepository {
 
       const taskId = result.rows[0].create_conversion_task_with_outbox;
 
+      if (!taskId) {
+        throw new Error('Erro ao criar conversão');
+      }
+
       const taskResult = await pool.query(
         `SELECT id, original_name, stored_name, input_path, mimetype, format, file_size, status, created_at, updated_at FROM conversion_tasks WHERE id = $1`,
         [taskId],
@@ -65,8 +69,9 @@ export class TaskRepository {
         [id],
       );
       return result.rows[0];
-    } catch (error) {
+    } catch (error) { 
       logger.error(error);
+      throw new Error('Erro ao buscar arquivo');
     }
   }
   async getTaskFiles(params: GetFilesParams): Promise<PaginationResult> {
