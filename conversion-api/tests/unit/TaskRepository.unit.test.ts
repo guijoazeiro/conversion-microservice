@@ -3,6 +3,7 @@ import { TaskRepository } from '../../src/repositories/TaskRepository';
 import { TestDataFactory } from '../helpers/test-helpers';
 import logger from '../../src/config/logger';
 import { pool } from '../../src/database/postgres';
+import { ERRORS } from '../../src/utils/constants';
 
 vi.mock('../../src/config/logger');
 vi.mock('../../src/database/postgres');
@@ -63,16 +64,16 @@ describe('TaskRepository - Unit Tests', () => {
 
     it('should handle database error during task creation', async () => {
       const conversionData = TestDataFactory.createMockConversionData();
-      const dbError = new Error('Database connection failed');
+      const dbError = new Error(ERRORS.CREATE_CONVERSION);
 
       mockPool.query.mockRejectedValueOnce(dbError);
 
       await expect(
         taskRepository.createConversion(conversionData),
-      ).rejects.toThrow('Database connection failed');
+      ).rejects.toThrow(ERRORS.CREATE_CONVERSION);
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        'Erro ao criar conversão:',
+        ERRORS.CREATE_CONVERSION,
         dbError,
       );
       expect(mockPool.query).toHaveBeenCalledTimes(1);
@@ -81,7 +82,7 @@ describe('TaskRepository - Unit Tests', () => {
     it('should handle error during task fetch after creation', async () => {
       const conversionData = TestDataFactory.createMockConversionData();
       const taskId = 'test-uuid';
-      const fetchError = new Error('Task fetch failed');
+      const fetchError = new Error(ERRORS.CREATE_CONVERSION);
 
       mockPool.query
         .mockResolvedValueOnce({
@@ -91,10 +92,10 @@ describe('TaskRepository - Unit Tests', () => {
 
       await expect(
         taskRepository.createConversion(conversionData),
-      ).rejects.toThrow('Task fetch failed');
+      ).rejects.toThrow(ERRORS.CREATE_CONVERSION);
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        'Erro ao criar conversão:',
+        ERRORS.CREATE_CONVERSION,
         fetchError,
       );
       expect(mockPool.query).toHaveBeenCalledTimes(2);
@@ -202,7 +203,7 @@ describe('TaskRepository - Unit Tests', () => {
       mockPool.query.mockRejectedValueOnce(dbError);
 
       await expect(taskRepository.getTaskById(taskId)).rejects.toThrow(
-        'Erro ao buscar arquivo',
+        ERRORS.GET_TASK_BY_ID,
       );
     });
 
@@ -292,7 +293,7 @@ describe('TaskRepository - Unit Tests', () => {
       mockPool.query.mockRejectedValueOnce(dbError);
 
       await expect(taskRepository.getTaskFiles(params)).rejects.toThrow(
-        'Erro ao buscar arquivos',
+        ERRORS.GET_TASK_FILES,
       );
     });
 

@@ -1,5 +1,6 @@
 import logger from '../config/logger';
 import { pool } from '../database/postgres';
+import { ERRORS } from '../utils/constants';
 import { buildWhereClause } from '../utils/sqlHelper';
 
 interface GetFilesParams {
@@ -47,7 +48,7 @@ export class TaskRepository {
       const taskId = result.rows[0].create_conversion_task_with_outbox;
 
       if (!taskId) {
-        throw new Error('Erro ao criar conversão');
+        throw new Error(ERRORS.CREATE_CONVERSION);
       }
 
       const taskResult = await pool.query(
@@ -57,8 +58,8 @@ export class TaskRepository {
 
       return taskResult.rows[0];
     } catch (error) {
-      logger.error('Erro ao criar conversão:', error);
-      throw error;
+      logger.error(ERRORS.CREATE_CONVERSION, error);
+      throw new Error(ERRORS.CREATE_CONVERSION);
     }
   }
 
@@ -70,8 +71,8 @@ export class TaskRepository {
       );
       return result.rows[0];
     } catch (error) { 
-      logger.error(error);
-      throw new Error('Erro ao buscar arquivo');
+      logger.error(ERRORS.GET_TASK_BY_ID, error);
+      throw new Error(ERRORS.GET_TASK_BY_ID);
     }
   }
   async getTaskFiles(params: GetFilesParams): Promise<PaginationResult> {
@@ -111,7 +112,8 @@ export class TaskRepository {
         },
       };
     } catch (error) {
-      throw new Error(`Erro ao buscar arquivos`);
+      logger.error(ERRORS.GET_TASK_FILES, error);
+      throw new Error(ERRORS.GET_TASK_FILES);
     }
   }
 }

@@ -3,6 +3,7 @@ import { FileService } from '../../src/service/file/FileService';
 import { HttpError } from '../../src/errors/HttpError';
 import { existsSync } from 'fs';
 import { TestConstants } from '../helpers/test-helpers';
+import { ERRORS } from '../../src/utils/constants';
 
 const mockTaskRepository = {
   getTaskById: vi.fn(),
@@ -36,7 +37,7 @@ describe('FileService - Unit Tests', () => {
       mockTaskRepository.getTaskById.mockResolvedValue(null);
       await expect(fileService.getStatus(id)).rejects.toThrow(
         new HttpError(
-          'Arquivo não encontrado',
+          ERRORS.FILE_NOT_FOUND,
           TestConstants.HTTP_CODES.NOT_FOUND,
         ),
       );
@@ -65,7 +66,7 @@ describe('FileService - Unit Tests', () => {
 
       await expect(fileService.download(id)).rejects.toThrow(
         new HttpError(
-          'Arquivo não encontrado',
+          ERRORS.FILE_NOT_FOUND,
           TestConstants.HTTP_CODES.NOT_FOUND,
         ),
       );
@@ -82,7 +83,7 @@ describe('FileService - Unit Tests', () => {
 
       await expect(fileService.download(id)).rejects.toThrow(
         new HttpError(
-          'Arquivo ainda não convertido',
+          ERRORS.FILE_NOT_COMPLETED,
           TestConstants.HTTP_CODES.BAD_REQUEST,
         ),
       );
@@ -99,7 +100,7 @@ describe('FileService - Unit Tests', () => {
 
       await expect(fileService.download(id)).rejects.toThrow(
         new HttpError(
-          'Arquivo não encontrado',
+          ERRORS.OUTPUT_FILE_NOT_FOUND,
           TestConstants.HTTP_CODES.BAD_REQUEST,
         ),
       );

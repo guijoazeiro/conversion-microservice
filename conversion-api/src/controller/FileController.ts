@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { FileService } from '../service/file/FileService';
 import { HttpError } from '../errors/HttpError';
-import { INTERNAL_SERVER_ERROR_CODE } from '../utils/constants';
+import { ERRORS, INTERNAL_SERVER_ERROR_CODE } from '../utils/constants';
 import logger from '../config/logger';
 
 export class FileController {
@@ -20,7 +20,7 @@ export class FileController {
       }
       res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .json({ error: 'Erro ao verificar status' });
+        .json({ error: ERRORS.INTERNAL_SERVER });
     }
   }
   async download(req: Request, res: Response) {
@@ -34,7 +34,7 @@ export class FileController {
       }
       res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .json({ error: 'Erro ao baixar arquivo' });
+        .json({ error: ERRORS.INTERNAL_SERVER });
     }
   }
 
@@ -52,7 +52,7 @@ export class FileController {
       logger.error(error);
       res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .json({ error: 'Erro ao buscar arquivos' });
+        .json({ error: ERRORS.INTERNAL_SERVER });
     }
   }
 }

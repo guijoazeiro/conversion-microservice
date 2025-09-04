@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import app from '../../src/app';
+import { ERRORS } from '../../src/utils/constants';
 
 vi.mock('../../src/database/postgres', () => ({
   pool: {
@@ -43,7 +44,7 @@ describe('FileStatus - Integration Tests', () => {
       .get('/api/file/status/abc123-def456-ghi789')
       .expect(404);
 
-    expect(response.body).toEqual({ error: 'Arquivo não encontrado' });
+    expect(response.body).toEqual({ error: ERRORS.FILE_NOT_FOUND });
   });
 
   it('should return 500 if the database connection fails', async () => {
@@ -56,7 +57,7 @@ describe('FileStatus - Integration Tests', () => {
       .expect(500);
 
     expect(response.body).toEqual({
-      error: 'Erro ao verificar status',
+      error: ERRORS.INTERNAL_SERVER,
     });
   });
 });

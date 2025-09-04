@@ -2,6 +2,7 @@ import supertest from 'supertest';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import app from '../../src/app';
 import { before } from 'node:test';
+import { ERRORS } from '../../src/utils/constants';
 
 vi.mock('../../src/database/postgres', () => ({
   pool: {
@@ -119,7 +120,7 @@ describe('GetFiles - Integration Tests', () => {
     const response = await supertest(app).get('/api/file').expect(500);
 
     expect(response.body).toEqual({
-      error: 'Erro ao buscar arquivos',
+      error: ERRORS.INTERNAL_SERVER,
     });
   });
 });

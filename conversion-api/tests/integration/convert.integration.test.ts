@@ -12,6 +12,7 @@ import request from 'supertest';
 import path from 'path';
 import fs from 'fs/promises';
 import app from '../../src/app';
+import { ERRORS } from '../../src/utils/constants';
 
 vi.mock('../../src/database/postgres', () => ({
   pool: {
@@ -100,7 +101,7 @@ describe('Convert API - Integração', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Nenhum arquivo enviado',
+        error: ERRORS.FILE_REQUIRED,
       });
 
       expect(mockPool.query).not.toHaveBeenCalled();
@@ -114,7 +115,7 @@ describe('Convert API - Integração', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Formato de arquivo para ser convertido inválido',
+        error: ERRORS.UNSUPPORTED_TARGET_FORMAT
       });
 
       expect(mockPool.query).not.toHaveBeenCalled();
@@ -128,7 +129,7 @@ describe('Convert API - Integração', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Arquivo com o mesmo formato de saída',
+        error: ERRORS.SAME_FORMAT
       });
 
       expect(mockPool.query).not.toHaveBeenCalled();
@@ -146,7 +147,7 @@ describe('Convert API - Integração', () => {
           .expect(400);
 
         expect(response.body).toEqual({
-          error: 'Formato de arquivo para ser convertido inválido',
+          error: ERRORS.UNSUPPORTED_MEDIA_FORMAT
         });
       } finally {
         await fs.unlink(txtFilePath);
@@ -165,7 +166,7 @@ describe('Convert API - Integração', () => {
         .expect(500);
 
       expect(response.body).toEqual({
-        error: 'Erro ao converter arquivo',
+        error: ERRORS.INTERNAL_SERVER
       });
 
       expect(mockPool.query).toHaveBeenCalledTimes(1);

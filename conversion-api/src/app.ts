@@ -22,7 +22,7 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocument, {
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'API de Conversão - Documentação',
+    customSiteTitle: 'File Conversion API',
   }),
 );
 

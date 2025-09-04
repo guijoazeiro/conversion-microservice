@@ -8,7 +8,7 @@ class OutboxProcessor {
   private intervalId: NodeJS.Timeout | null = null;
 
   async start() {
-    logger.info("Iniciando Outbox Processor...");
+    logger.info("Starting Outbox Processor...");
 
     const pgHealthy = await database.healthCheck();
     const redisHealthy = await queueService.healthCheck();
@@ -18,9 +18,9 @@ class OutboxProcessor {
       process.exit(1);
     }
 
-    logger.info("Outbox Processor iniciado com sucesso");
-    logger.info(`Intervalo de processamento: ${PROCESSOR_INTERVAL}ms`);
-    logger.info(`Tamanho do Batch: ${BATCH_SIZE}`);
+    logger.info("Outbox Processor started successfully");
+    logger.info(`Processor Interval: ${PROCESSOR_INTERVAL}ms`);
+    logger.info(`Batch Size: ${BATCH_SIZE}`);
 
     this.isRunning = true;
     this.scheduleNextRun();
@@ -33,7 +33,7 @@ class OutboxProcessor {
       try {
         await this.processEvents();
       } catch (error) {
-        logger.error("Erro ao processar eventos", error);
+        logger.error("Error processing events: ", error);
       } finally {
         this.scheduleNextRun();
       }
@@ -44,11 +44,11 @@ class OutboxProcessor {
     const events = await database.getUnprocessedEvents(BATCH_SIZE);
 
     if (events.length === 0) {
-      logger.debug("Nenhum evento de conversão pendente encontrado");
+      logger.debug("No events to process");
       return;
     }
 
-    logger.info(`Processando ${events.length} evento(s) de conversão...`);
+    logger.info(`Processing ${events.length} events`);
 
     for (const event of events) {
       try {
@@ -57,27 +57,27 @@ class OutboxProcessor {
         const taskQueued = await database.markTaskQueued(event.aggregate_id);
         if (!taskQueued) {
           logger.warn(
-            `Tarefa ${event.aggregate_id} não foi marcada como queued (pode já ter sido processada)`,
+            `Task ${event.aggregate_id} was not marked as queued (may already have been processed)`,
           );
         }
 
         const eventProcessed = await database.markEventProcessed(event.id);
         if (!eventProcessed) {
-          logger.warn(`Evento ${event.id} não foi marcado como processado`);
+          logger.warn(`Event ${event.id} was not marked as processed`);
         } else {
           logger.info(
-            `Tarefa ${event.aggregate_id} enviada para a fila e marcada como queued`,
+            `Task ${event.aggregate_id} sent to the queue and marked as queued`,
           );
         }
       } catch (err: any) {
-        logger.error(`Erro ao processar evento ${event.id}:`, err.message);
+        logger.error(`Error processing event ${event.id}: ${err.message}`);
         await database.markEventFailed(event.id, err.message);
       }
     }
   }
 
   async stop() {
-    logger.info("Parando Outbox Processor...");
+    logger.info("Stopping Outbox Processor...");
     this.isRunning = false;
 
     if (this.intervalId) {
@@ -86,7 +86,7 @@ class OutboxProcessor {
 
     await database.close();
     await queueService.close();
-    logger.info("Outbox Processor parado com sucesso");
+    logger.info("Outbox Processor stopped successfully");
   }
 }
 
@@ -103,6 +103,6 @@ process.on("SIGINT", async () => {
 });
 
 processor.start().catch((error) => {
-  logger.error("Erro ao iniciar o Outbox Processor:", error);
+  logger.error("Error starting Outbox Processor: ", error);
   process.exit(1);
 });

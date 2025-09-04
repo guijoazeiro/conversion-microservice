@@ -4,6 +4,7 @@ import {
   BAD_REQUEST_CODE,
   ALLOWED_FORMATS_MAP,
   STATUS_PENDING,
+  ERRORS,
 } from '../../utils/constants';
 import { MediaType } from '../../utils/types';
 
@@ -25,14 +26,14 @@ export class ConversionService {
 
     if (!allowedFormats) {
       throw new HttpError(
-        'Formato de arquivo para ser convertido inválido',
+        ERRORS.UNSUPPORTED_MEDIA_FORMAT,
         BAD_REQUEST_CODE,
       );
     }
 
     if (!allowedFormats.includes(format)) {
       throw new HttpError(
-        'Formato de arquivo para ser convertido inválido',
+        ERRORS.UNSUPPORTED_TARGET_FORMAT,
         BAD_REQUEST_CODE,
       );
     }
@@ -41,7 +42,7 @@ export class ConversionService {
 
     if (originalFileFormat === format) {
       throw new HttpError(
-        'Arquivo com o mesmo formato de saída',
+        ERRORS.SAME_FORMAT,
         BAD_REQUEST_CODE,
       );
     }
@@ -59,7 +60,7 @@ export class ConversionService {
     const task = await this.taskRepository.createConversion(conversionData);
 
     if (!task) {
-      throw new HttpError('Erro ao criar tarefa', BAD_REQUEST_CODE);
+      throw new HttpError(ERRORS.CREATE_CONVERSION, BAD_REQUEST_CODE);
     }
 
     return task;

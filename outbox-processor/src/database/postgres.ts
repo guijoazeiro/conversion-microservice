@@ -21,7 +21,7 @@ class PostgresDatabase {
     });
 
     this.pool.on("error", (err) => {
-      logger.error("Erro na conexão com o PostgreSQL:", err);
+      logger.error("Error connecting to database:", err);
     });
   }
 

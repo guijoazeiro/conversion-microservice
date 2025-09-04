@@ -12,6 +12,7 @@ import app from '../../src/app';
 import { writeFile, mkdir, unlink, rmdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { ERRORS } from '../../src/utils/constants';
 
 vi.mock('../../src/database/postgres', () => ({
   pool: {
@@ -99,7 +100,7 @@ describe('FileDownload - Integration Tests', () => {
       .expect(404);
 
     expect(response.body).toEqual({
-      error: 'Arquivo não encontrado',
+      error: ERRORS.FILE_NOT_FOUND,
     });
   });
 
@@ -119,7 +120,7 @@ describe('FileDownload - Integration Tests', () => {
       .expect(400);
 
     expect(response.body).toEqual({
-      error: 'Arquivo ainda não convertido',
+      error: ERRORS.FILE_NOT_COMPLETED,
     });
   });
 
@@ -139,7 +140,7 @@ describe('FileDownload - Integration Tests', () => {
       .expect(400);
 
     expect(response.body).toEqual({
-      error: 'Arquivo não encontrado',
+      error: ERRORS.OUTPUT_FILE_NOT_FOUND,
     });
   });
 
@@ -159,7 +160,7 @@ describe('FileDownload - Integration Tests', () => {
       .expect(400);
 
     expect(response.body).toEqual({
-      error: 'Arquivo ainda não convertido',
+      error: ERRORS.FILE_NOT_COMPLETED,
     });
   });
 
@@ -171,7 +172,7 @@ describe('FileDownload - Integration Tests', () => {
       .expect(500);
 
     expect(response.body).toEqual({
-      error: 'Erro ao baixar arquivo',
+      error: ERRORS.INTERNAL_SERVER,
     });
   })
 });

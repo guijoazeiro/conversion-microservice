@@ -39,11 +39,11 @@ describe('connectDB', () => {
 
     await connectDB();
 
-    expect(mockLogger.info).toHaveBeenCalledWith('Conectando ao banco de dados...');
+    expect(mockLogger.info).toHaveBeenCalledWith('Connecting to database...');
     expect(mockPool.connect).toHaveBeenCalledTimes(1);
     expect(mockClient.query).toHaveBeenCalledWith('SELECT 1');
     expect(mockClient.release).toHaveBeenCalledTimes(1);
-    expect(mockLogger.info).toHaveBeenCalledWith('Banco de dados conectado com sucesso');
+    expect(mockLogger.info).toHaveBeenCalledWith('Database connected successfully');
   });
 
   it('should throw error and log error message when connection fails', async () => {
@@ -52,8 +52,8 @@ describe('connectDB', () => {
 
     await expect(connectDB()).rejects.toThrow('Connection refused');
     
-    expect(mockLogger.info).toHaveBeenCalledWith('Conectando ao banco de dados...');
-    expect(mockLogger.error).toHaveBeenCalledWith('Erro ao conectar ao banco de dados:', connectionError);
+    expect(mockLogger.info).toHaveBeenCalledWith('Connecting to database...');
+    expect(mockLogger.error).toHaveBeenCalledWith('Error connecting to database:', connectionError);
     expect(mockClient.release).not.toHaveBeenCalled();
   });
 
@@ -64,11 +64,11 @@ describe('connectDB', () => {
 
     await expect(connectDB()).rejects.toThrow('Query failed');
     
-    expect(mockLogger.info).toHaveBeenCalledWith('Conectando ao banco de dados...');
+    expect(mockLogger.info).toHaveBeenCalledWith('Connecting to database...');
     expect(mockPool.connect).toHaveBeenCalledTimes(1);
     expect(mockClient.query).toHaveBeenCalledWith('SELECT 1');
     expect(mockClient.release).toHaveBeenCalledTimes(0);
-    expect(mockLogger.error).toHaveBeenCalledWith('Erro ao conectar ao banco de dados:', queryError);
+    expect(mockLogger.error).toHaveBeenCalledWith('Error connecting to database:', queryError);
   });
 
   it('should handle client release error gracefully', async () => {

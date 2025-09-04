@@ -102,7 +102,7 @@ export default class QueueService {
       await this.connection.ping();
       return true;
     } catch (error) {
-      logger.error("Redis health check falhou:", error);
+      logger.error("Redis health check failed: ", error);
       return false;
     }
   }
@@ -150,7 +150,7 @@ export default class QueueService {
 
       return status;
     } catch (error) {
-      logger.error("Erro ao obter status das filas:", error);
+      logger.error("Error getting queue status: ", error);
       throw error;
     }
   }
@@ -165,7 +165,7 @@ export default class QueueService {
       }
       await this.connection.quit();
     } catch (error) {
-      logger.error("Erro ao fechar conexão com o Redis:", error);
+      logger.error("Error closing Redis connection: ", error);
       this.connection.disconnect();
     }
   }
