@@ -19,21 +19,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-  mongo:
-    image: mongo:6
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - conversion-network
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
 
   redis:
     image: redis:7
@@ -47,24 +32,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-
-  mongo-express:
-    image: mongo-express:1.0.2
-    container_name: mongo-express
-    ports:
-      - "8081:8081"
-    environment:
-      - ME_CONFIG_MONGODB_SERVER=mongo
-      - ME_CONFIG_MONGODB_PORT=27017
-      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
-    depends_on:
-      mongo:
-        condition: service_healthy
-    networks:
-      - conversion-network
-    restart: unless-stopped
 
   redis-commander:
     image: rediscommander/redis-commander:latest
@@ -120,7 +87,7 @@ services:
       - POSTGRES_PASSWORD=postgres123
       - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/converter
       - REDIS_URL=redis://redis:6379
-      - PROCESSOR_INTERVAL=10000
+      - PROCESSOR_INTERVAL=500
       - PROCESSOR_BATCH_SIZE=10
     depends_on:
       postgres:
@@ -146,7 +113,6 @@ services:
       - POSTGRES_PASSWORD=postgres123
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MONGO_URI=mongodb://mongo:27017/converter
       - WORKER_TYPE=light
       - LIGHT_WORKERS=3
 
@@ -154,9 +120,7 @@ services:
       - conversion-files:/tmp
     depends_on:
       postgres:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
+        condition: service_healthy     
       redis:
         condition: service_healthy
       conversion-api:
@@ -176,16 +140,13 @@ services:
       - POSTGRES_PASSWORD=postgres123
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MONGO_URI=mongodb://mongo:27017/converter
       - WORKER_TYPE=light
       - LIGHT_WORKERS=3
     volumes:
       - conversion-files:/tmp
     depends_on:
       postgres:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
+        condition: service_healthy      
       redis:
         condition: service_healthy
       conversion-api:
@@ -206,16 +167,13 @@ services:
       - POSTGRES_PASSWORD=postgres123
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MONGO_URI=mongodb://mongo:27017/converter
       - WORKER_TYPE=heavy
       - HEAVY_WORKERS=2  
     volumes:
       - conversion-files:/tmp
     depends_on:
       postgres:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
+        condition: service_healthy      
       redis:
         condition: service_healthy
       conversion-api:
@@ -240,16 +198,13 @@ services:
       - POSTGRES_PASSWORD=postgres123
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MONGO_URI=mongodb://mongo:27017/converter
       - WORKER_TYPE=heavy
       - HEAVY_WORKERS=2
     volumes:
       - conversion-files:/tmp
     depends_on:
       postgres:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
+        condition: service_healthy      
       redis:
         condition: service_healthy
       conversion-api:
@@ -265,7 +220,6 @@ services:
 
 volumes:
   postgres_data:
-  mongo_data:
   conversion-files:
 
 networks:
