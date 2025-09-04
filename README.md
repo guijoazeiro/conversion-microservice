@@ -270,20 +270,37 @@ file-conversion-microservices/
 │   ├── package-lock.json
 │   ├── package.json
 │   └── tsconfig.json
+|
 ├── conversion-worker/
-│   ├── converter/
-│   │   ├── audio.go
-│   │   ├── converter.go
-│   │   ├── image.go
-│   │   └── video.go
-│   ├── database/
-│   │   ├── database.go
-│   |── .env.example
+│   ├── cmd/
+│   │   └── worker/
+│   │       └── main.go             
+│   ├── internal/
+│   │   ├── config/
+│   │   │   └── config.go           
+│   │   ├── worker/
+│   │   │   ├── worker.go            
+│   │   │   └── pool.go              
+│   │   ├── queue/
+│   │   │   └── redis.go             
+│   │   ├── database/
+│   │   │   └── postgres.go         
+│   │   ├── converter/
+│   │   │   ├── converter.go         
+│   │   │   ├── audio.go             
+│   │   │   ├── image.go             
+│   │   │   └── video.go             
+│   │   └── models/
+│   │       └── job.go               
+│   ├── pkg/
+│   │   └── logger/
+│   │       └── logger.go
+│   ├── .env.example
 │   ├── .gitignore
 │   ├── Dockerfile
 │   ├── go.mod
-│   ├── go.sum
-│   └── main.go
+│   └──  go.sum
+|
 ├── int-db/
 │   ├── 01_init_tables.sql
 │   └── 02_functions.sql
@@ -298,8 +315,8 @@ file-conversion-microservices/
 │   │   ├── queue/
 │   │   │   └── redis.ts
 │   │   ├── index.ts
-│   └── env.example
-│   
+│   └── env.example 
+|  
 ├── .gitignore
 ├── docker-compose.yml
 ├── README.md
